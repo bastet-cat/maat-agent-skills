@@ -14,7 +14,7 @@ Choose the input mode from the invocation:
 
 ## Establish the Maat context
 
-Check whether the active client exposes a Maat SessionStart receipt and tools. If unavailable, say so; continue source-based read-only analysis, but stop before Maat writes or claims about Maat state that cannot be verified. If a receipt is exposed, confirm every configured skill loaded. Discover exact tool names and schemas; never assume a prefix or a capability exposed by another client.
+Check the active client's Maat capabilities individually. If a SessionStart receipt is available, confirm every configured skill loaded. Its absence alone does not block operational writes: continue when the operational MCP is connected and exposes the required live operations and schemas. If the operational MCP is disconnected or a required create/link schema is missing, stop before writing and name the exact gap. Never assume a tool prefix or a capability exposed by another client.
 
 For repository work, establish project identity and revision from explicit Maat references; use `codebase_status`, `workspace_search`, and operational/document search when available. Keep project, branch/revision, document IDs/revisions, and code locations with evidence. If there is no unambiguous Maat reference, ask the user for the repository URL and intended branch/access. Once provided, clone it into an isolated workspace and map the codebase at the checked-out commit before making project-specific claims. Identify clone evidence as such, not as indexed Maat evidence; report unknown Maat operational context separately. Missing or stale evidence is not proof that no impact or related work exists. Do not start index updates or request credentials in chat.
 
@@ -46,13 +46,49 @@ Before writing, perform a coverage pass in both directions: every source need is
 
 Before creating proposal/check records, show a concise, plain-language summary of the source goal, current behavior, intended outcome, mapped feature/bug slices, affected project and revision, linked checks, scope boundaries, evidence versus inference, and unresolved questions. Carry forward confirmation already given for the same source, project revision, and scope; do not repeat that question. Ask only if the understanding is new, materially changed, or consequentially ambiguous. Incorporate corrections before writing; human product review remains a separate gate.
 
-## Submit proposals for human review
+## Create and verify operational records
 
-Before writing, inspect the actual Maat document catalog, available document operations, relationship syntax, and review workflow. The catalog describes `prd` and `check` as proposed capabilities; do not infer PRD CRUD, check documents, or relationships from catalog text. Markdown `[[...]]` links are documented; do not assume proposed `docs://` links are supported. A skill execution review is not a product proposal review.
+Use structured operational records as the primary output of this skill. This is distinct from creating a document and submitting it to product review. In conversation mode, lack of a document-review workflow is never a reason to omit operational records.
 
-Create a Maat `feature` or `bug` proposal and its validation checks through confirmed Maat operations, preserving source/related-document links only through confirmed fields and relationship formats. Associate every check with the proposal and retain its criteria traceability. The catalog currently lists `check` as a proposed artifact, not an implemented document type. If the active Maat session has no confirmed mechanism to create and associate checks, stop before creating the feature/bug and report the exact missing capability; do not treat a prose-only list or unrelated document type as an integrated check record. Then submit each proposal to the supported human product-review workflow. The catalog currently describes `review` as associated with a feature or ADR; confirm whether the installed workflow supports reviewing a bug proposal and relating PRD-originated proposals. If any required create, check, relationship, or review operation is unavailable, stop and report the exact missing capability. Do not claim a proposal was submitted, substitute a local file, or record a decision on behalf of the reviewer.
+### Preflight the operational contract
 
-For every write, retain an operation receipt with returned proposal/check IDs, type, revision/status, and confirmed source, proposal, and criterion relations. Verify those links through a supported read when available. If the Maat contract cannot create or expose the required relation, report the precise gap and do not describe the check as integrated.
+Discover the active client's actual operational tools and schemas. Before the first write, confirm that the operational MCP is connected and `operational_record` can create the needed `feature` or `bug`, a `plan`, and `check` records; confirm that both `plan` and `check` accept the returned feature ID through `feature_id`. Inspect the fields and status behavior to confirm the records can carry the proposal content and remain `planned`. Do not infer these capabilities from the document catalog or a different client's tools.
+
+Map scope, evidence, criteria, risks, dependencies, and open questions into fields the live schema actually accepts. Confirm how the live schema accepts `operation_id` and `expected_version`, including the documented expected version for creation and update. Use both on each write as the contract specifies; reuse the same operation ID when retrying the same logical write. Preflight all three record kinds, the required concurrency/idempotency fields, and the `feature_id` relation before creating anything. If the operational MCP is disconnected, or a required create kind, field, or link is unsupported, make no writes and report exactly which operation/schema element is missing. Do not substitute Markdown documents, `brain_import_markdown`, or free-form notes for these records.
+
+The lack of an available document-review operation is not a preflight failure. Continue with operational record creation and report the missing review capability afterward.
+
+### Avoid duplicates and write in dependency order
+
+Before creating records, search supported operational sources for matches using source identity, project, stable IDs, and proposal/check meaning. Reuse exact matching records. If records already exist, read them before deciding whether to reuse or update; do not overwrite human review state or approved decisions. If collection search is unavailable, look up stable IDs with supported reads and use the documented `operation_id` idempotency contract; report when a broad duplicate search could not be performed. Update only through a supported operation using the exact current `expected_version`. On a version conflict, read the latest record and reassess instead of retrying blindly.
+
+Use stable IDs for the feature, plan, and each check wherever the schema allows caller-supplied IDs. Otherwise, retain the IDs returned by Maat. Use a stable `operation_id` for each logical write and reuse it on retries; never create a new operation ID just to retry the same write. Supply `expected_version` according to the live schema's documented create/update semantics; do not guess an initial version or invent a field.
+
+Create or update only the records needed, in this order:
+
+1. **Feature or bug:** choose `feature` for new behavior and `bug` for a correction to established behavior. Record the source, problem/current behavior, intended outcome, scope and exclusions, affected project/evidence, acceptance criteria, risks, dependencies, and open questions in schema-supported fields.
+2. **Plan:** create `kind: plan` with `feature_id` set to the feature/bug ID returned by Maat. Include the delivery scope/slices, criterion coverage, evidence, dependencies, risks, and unresolved decisions supported by the schema.
+3. **Checks:** create one `kind: check` record per falsifiable check, each with the same `feature_id`. Every check must identify its criterion, scenario/setup and action, and observable expected result/evidence. Keep check IDs stable across retries and avoid duplicate checks for the same criterion/scenario.
+
+Set or retain status `planned` for the feature/bug, plan, and checks until a human review/approval is actually recorded. Never write an approved decision on the user's behalf. If an unexpected write failure occurs after some records were created, report the exact partial state and IDs; do not conceal it or recreate successful writes. Resume only missing/failed writes with the same stable identifiers and operation IDs after reading current state.
+
+### Read back and verify
+
+After writes, use `operational_get` or another confirmed read operation to fetch the feature/bug, plan, and every check. Verify and report each record's ID, kind, current version/status, `feature_id` relation, and stored scope/criteria. Confirm that all records point to the same feature/bug and remain `planned` unless a human decision is independently confirmed. If a read operation is unavailable, report exactly which records or relations could not be verified; do not claim successful verification.
+
+## Optional document review
+
+Only after operational records are read back and their IDs and relations are verified, inspect the live document review operations and schemas. Submit the feature/bug and checks (and plan only if supported) for review only when the operation explicitly accepts those record kinds/IDs and returns a review result. Capture the returned review ID/link and state. A document-review operation is optional and separate from operational record creation.
+
+If document review is unavailable or does not accept these operational records, preserve the verified operational records, leave their status `planned`, and tell the user that no approval link is available. If review is submitted but pending, report `submitted`, not `approved`; report `approved` only after reading a human approval/decision from a supported source. Do not imply that a review link exists when none was returned, or that operational records themselves are documents submitted to review.
+
+## Regression safeguards
+
+- Operational writes are available while document review is unavailable: create and read back the feature/bug, plan, and checks; report that no approval link exists.
+- Matching records already exist: reuse them, or update with the current expected version and stable operation ID; do not create duplicates.
+- A required kind, create schema, `feature_id` relation, or `planned` state cannot be supported: preflight and stop before any write, naming the missing operation/field/relation.
+- Document review is available: create and verify operational records first, then submit only supported kinds; distinguish operational `planned` state, review `submitted`, and human `approved` state.
+- Never set or claim `approved` without a human decision confirmed through a supported read.
 
 The review packet must make the proposal understandable without relying on unstated context. Include:
 
@@ -67,5 +103,5 @@ The review packet must make the proposal understandable without relying on unsta
 
 Before submitting, check the proposed breakdown for over-splitting and missing integration: each proposal should answer “what can a user or operator observe when this lands?” and each dependency should name the prerequisite outcome, not merely a related component. Keep the user's original requirements intact when removing an unnecessary ticket/slice.
 
-After submission, show the user each proposal and review identifier/link returned by Maat, its source traceability, and any unresolved gap. Stop at human review. A later review response can drive proposal edits; only a human decision may authorize the next state in the document flow.
+Report the verified operational IDs, kinds, versions, statuses, and `feature_id` relations; summarize source traceability and unresolved gaps. Include a review link only when the optional document-review operation returned one. Stop at the human review/approval gate. A later review response can inform record updates, but only a confirmed human decision may authorize an approved state.
 
