@@ -1,6 +1,7 @@
 # Benchmark qualitativo dos fluxos de skills
 
 - **Data:** 2026-10-24
+- **Tabela do fluxo-alvo revisada:** 2026-10-25
 - **Escopo:** fluxo de produto e implementação descrito pelas skills Maat neste checkout, Tech Leads Club (TLC) e Matt Pocock/Grill.
 - **Tipo de avaliação:** estimativa qualitativa da probabilidade de interpretar corretamente o objetivo em cada etapa; não é um ensaio empírico de taxa de sucesso.
 
@@ -24,21 +25,23 @@ Os valores são aproximações qualitativas, não medições, e a incerteza razo
 
 ## Comparação por etapa
 
-| Etapa | Maat | TLC | Matt Pocock/Grill | Sinal que sustenta a estimativa |
+| Etapa do fluxo | Maat | TLC | Matt Pocock/Grill | Sinal que sustenta a estimativa |
 | --- | ---: | ---: | ---: | --- |
-| Descobrir o problema e a intenção | 95% | **97%** | 94% | `to-prd` recupera situação, usuário, workaround, outcome e alternativas; TLC Discover insiste na ordem situação→problema→veredito e evita convergir cedo; Grill esclarece termos e decisões, com foco mais forte em mudanças iniciadas dentro de um repositório. |
-| Formalizar intenção em PRD/design/spec | **95%** | 94% | **95%** | Maat liga requisitos à origem e faz cobertura final; TLC transforma descoberta em design vertical e registra decisões/fluxos; Matt `to-spec` sintetiza decisões já tomadas. TLC e Matt produzem artefatos diferentes de um PRD de produto, então a comparação é aproximada. |
-| Refinar a intenção contra o código e as restrições | 95% | **96%** | 92% | `to-tech-plan` exige evidência por superfície e separa inferência de requisito; `tlc-plan` fundamenta critérios no código e marca lacunas como abertas; o fluxo Matt consulta código/docs, mas seu refinamento e a decomposição em tickets são etapas distintas. |
-| Decompor em features/tarefas e checks sem mudar o objetivo | 96% | **97%** | 95% | `to-plan` rastreia requisito→feature/bug→critério→check; TLC Plan recusa critérios inventados e separa slices antes de decidir quantas tarefas; `to-tickets` cria tickets verticais e dependências. Os pontos de Maat sobre recibos/integrações afetam operação, excluída desta estimativa. |
-| Verificar que o plano representa a intenção de origem | 96% | **97%** | 93% | `validate-plan` reconstrói a cadeia da fonte à evidência e identifica omissões; TLC exige critérios observáveis e devolve lacunas ao usuário; o fluxo Matt inclui aprovação de spec/tamanho e revisão, mas não usa o mesmo validador independente por requisito. |
-| Executar sem desviar do objetivo aprovado | 92% | **96%** | 94% | Maat vincula implementação à proposta aprovada e aos checks; TLC congela obrigações e usa checks como contrato de execução; Matt executa tickets em grafo ligados à spec. A nota mede preservação de intenção, não velocidade nem qualidade do código. |
-| Julgar corretamente se o objetivo foi satisfeito | 97% | **98%** | 92% | Maat requer verificador independente e evidência por check; TLC exige verificador independente que preste contas de cada check; Matt usa implementação/revisão, mas a documentação consultada não impõe o mesmo veredito independente contra cada obrigação da spec. |
+| Capturar o anseio e escolher entre entrada curta ou PRD | 95% | **97%** | 94% | `to-prd` investiga situação, usuário, workaround, resultado e alternativas. A entrada direta de `to-plan` agora exige exatamente uma feature/fix; pedidos maiores voltam para PRD. TLC Discover ordena situação→problema→veredito; Grill esclarece termos e decisões, sobretudo em mudanças dentro de repositório. |
+| Formalizar a necessidade em PRD | **95%** | 94% | **95%** | Maat liga requisitos à origem e faz cobertura final; TLC transforma descoberta em design vertical; Matt `to-spec` sintetiza decisões. TLC e Matt não produzem exatamente o mesmo tipo de PRD de produto, então a comparação é aproximada. |
+| Refinar tecnicamente o PRD e revisar | **96%** | **96%** | 92% | `to-tech-plan` exige evidência por superfície, identifica escopo amplo e separa inferência de requisito. O pacote pode ser revisto por documento Maat ou no chat. `tlc-plan` fundamenta critérios no código; o fluxo Matt separa refinamento e tickets. |
+| Decompor o PRD em feature(s)/fix(es) e checks | **97%** | **97%** | 95% | `to-plan` rastreia requisito→feature/bug→critério→check; com PRD pode gerar várias propostas justificadas. Direto por prompt/contexto, limita a uma proposta e exige PRD se resultar mais de uma. TLC Plan recusa critérios inventados; `to-tickets` cria tickets verticais e dependências. A nota não mede sucesso das gravações no Maat. |
+| Revisar a proposta e confirmar prontidão | 96% | **97%** | 93% | `validate-plan` reconstrói a cadeia da fonte à evidência; propostas podem ser revistas por fluxo documental ou no chat, mantendo feedback separado de aprovação. TLC exige critérios observáveis; o fluxo Matt inclui aprovação de spec/tamanho e revisão, mas não o mesmo validador independente por requisito. |
+| Implementar sem desviar do objetivo aprovado | 92% | **96%** | 94% | Maat vincula implementação à proposta aprovada e aos checks; TLC congela obrigações e usa checks como contrato de execução; Matt executa tickets em grafo ligados à spec. A nota mede preservação da intenção, não velocidade nem qualidade do código. |
+| Validar checks e desbloquear requisitos | N/D | **98%** | 92% | O fluxo-alvo do Maat prevê `validate-checks`, mas essa skill não existe neste checkout; `validate-plan` verifica prontidão do plano e não comprova execução dos checks. TLC exige verificador independente por check. A documentação Matt consultada não impõe o mesmo veredito independente contra cada obrigação da spec. |
+
+`N/D` significa que não há base para estimar essa etapa no fluxo Maat atual; não equivale a 0% nem a uma falha. As porcentagens nas demais células continuam estimativas qualitativas de fidelidade à intenção, não eficiência operacional medida.
 
 ## Evidências principais
 
 ### Maat
 
-O pacote atual separa criação do PRD (`to-prd`), refinamento técnico (`to-tech-plan`), decomposição em feature/bug (`to-plan`), prontidão (`validate-plan`) e execução (`to-implement`). As skills exigem evidência de projeto/documento, preservam a revisão e decisão humanas e evitam inventar operações de escrita. `to-plan` mapeia checks a critérios de aceite e interrompe a criação se não existir operação confirmada para registrar e associar checks.
+O pacote atual separa criação do PRD (`to-prd`), refinamento técnico (`to-tech-plan`), decomposição em feature/bug (`to-plan`), prontidão (`validate-plan`) e execução (`to-implement`). As skills exigem evidência de projeto/documento, preservam a revisão e decisão humanas e evitam inventar operações de escrita. `to-plan` limita a entrada direta a uma feature/fix, recomenda o PRD se o prompt ou contexto exigir mais propostas, mapeia checks a critérios de aceite e interrompe a gravação de checks se não houver operação confirmada para associá-los. A revisão pode ocorrer em documento Maat ou no chat, sem tratar feedback como aprovação.
 
 O catálogo local informa que `prd` é proposto e não implementado; `check` também é proposto, enquanto `validation` é implementado. O documento de fluxos ressalta que os tipos reconhecidos não garantem todas as interações descritas e que revisão de produto é diferente de code review. Portanto, a maior vantagem de desenho do Maat ainda não se traduz em ponta a ponta enquanto essas integrações não forem confirmadas.
 
@@ -60,18 +63,35 @@ O catálogo local informa que `prd` é proposto e não implementado; `check` tam
 
 ## Recomendação para a stack Maat
 
-Manter a sequência com fronteiras explícitas:
+O fluxo completo desejado para transformar uma necessidade em requisitos atendidos é:
 
 ```text
-to-prd → to-tech-plan → revisão humana → to-plan → checks Maat → validate-plan
-       → decisão humana → to-implement → validações Maat
+[anseio do solicitante] → to-prd → [PRD] → to-spec-plan
+→ [PRD com refinamento técnico] → to-plan
+→ [feature(s)/fixe(s) + checks] → to-implement[] → [changes]
+→ validate-checks → [desbloqueio dos requisitos]
 ```
 
-1. Usar o rigor de descoberta do TLC quando a necessidade ou o resultado ainda estão em aberto; registrar a decisão de produto no PRD Maat.
-2. Usar `to-tech-plan` apenas para impactos técnicos e lacunas do PRD; deixar a criação de features/bugs para `to-plan`, evitando duplicar responsabilidade.
-3. Preservar o mapeamento requisito→feature/bug→check em todos os passos. Resolver a capacidade nativa de check e suas relações antes de declarar a automação completa.
-4. Usar slices verticais e dependências do Matt/TLC quando o escopo realmente atravessar sessões ou tiver paralelismo. Para uma mudança pequena, manter uma unidade executável sem gerar tickets desnecessários.
-5. Confirmar no Maat as relações e campos nativos que ligam check, validação, proposta e revisão implementada. As skills agora exigem esses vínculos e uma verificação independente, mas a conclusão ponta a ponta continua condicionada à disponibilidade dessas operações no cliente.
+Para pedidos curtos e decididos que cabem em uma única feature ou fix, o usuário pode entrar diretamente por `to-plan`:
+
+```text
+[pedido curto: uma feature ou um fix] → to-plan
+→ [uma feature/fix + checks] → to-implement[] → [changes]
+→ validate-checks → [desbloqueio do requisito]
+```
+
+Essa entrada direta não deve gerar várias propostas. Se interpretar o prompt direto ou o contexto da conversa levar a mais de uma feature/fix, abranger resultados independentes ou revelar escopo de produto não decidido, `to-plan` não gera nenhuma proposta e exige que o usuário comece por `to-prd`, registrando o escopo em um PRD. No caminho completo via PRD, `to-plan` pode gerar múltiplas features/fixes quando os requisitos justificarem essa decomposição.
+
+Cada etapa tem uma saída que vira a entrada rastreável da seguinte: `to-prd` formaliza o anseio como PRD; `to-spec-plan` acrescenta o refinamento técnico sem mudar a intenção do produto; `to-plan` decompõe o PRD refinado em features/fixes com critérios e checks; `to-implement` entrega as mudanças; `validate-checks` confirma os checks e registra evidências para desbloquear os requisitos correspondentes.
+
+No checkout atual, os nomes equivalentes mais próximos são `to-tech-plan` para `to-spec-plan` e `validate-plan` para `validate-checks`. Essa equivalência é apenas de intenção: `validate-plan` avalia completude e prontidão do plano e não substitui a validação de checks de implementação. `to-spec-plan` e `validate-checks` não existem ainda com esses IDs neste repositório. O fluxo acima é o estado-alvo; não deve ser descrito como já automatizado até que as skills, relações entre artefatos e operações de validação estejam implementadas e confirmadas no Maat.
+
+1. Usar `to-prd` para investigar e registrar o problema, os usuários, os resultados esperados e as decisões de produto; se o anseio ainda estiver amplo ou ambíguo, não pular essa etapa.
+2. Usar `to-spec-plan` para mapear impactos e contratos técnicos no projeto e devolver um PRD refinado para revisão humana. A revisão pode ocorrer por um fluxo documental Maat ou diretamente no chat; feedback não é aprovação até que o responsável a confirme explicitamente.
+3. Usar `to-plan` para manter rastreabilidade requisito→feature/bug→critério→check. Cada proposta deve ser um resultado observável, sem sobre-decomposição.
+4. Usar `to-implement` somente após aprovação do escopo aplicável e implementar as features/fixes aprovadas, preservando relações com os checks.
+5. Usar `validate-checks` após as mudanças para executar/verificar cada check, registrar resultado e evidência, e desbloquear somente os requisitos cujos checks passaram. Falha, ausência de evidência ou check não executado não desbloqueia requisito.
+6. Confirmar no Maat os IDs, estados e relações nativas entre PRD, refinamento técnico, features/fixes, checks, mudanças e validações antes de declarar o fluxo ponta a ponta concluído.
 
 ## Como transformar este benchmark em medição empírica
 

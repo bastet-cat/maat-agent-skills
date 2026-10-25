@@ -9,6 +9,8 @@ Accept a PRD argument in the form `@<url-or-path>`; use the host client's skill 
 
 This is technical discovery and refinement before executable planning or implementation. Preserve the product intent in the source. Do not create implementation tickets, decide product questions for the owner, start coding, or turn recommendations into commitments. Optimize for faithful, evidence-backed interpretation; never claim a numeric confidence such as 99% without a measured evaluation.
 
+This skill does not create operational feature/bug proposals or implementation checks. It prepares a technical review and, after explicit approval, a refined PRD. Use `to-plan` after the product requirements and technical refinement are ready when the user wants executable feature/bug records.
+
 ## 1. Read the source
 
 Resolve the argument after `@` as a local path or remote document using the available file or document tools. For remote sources, use an available authorized connector or browser; do not assume a particular provider. Capture the title, stable ID, revision or last-modified marker, objectives, requirements, constraints, and references. Record the exact source location and revision evidence.
@@ -29,6 +31,8 @@ Carry forward a compact project context record: canonical repository/project ide
 
 For each requirement, trace relevant surfaces instead of stopping at the first matching component: entry points and actors; authorization and tenant boundaries; state/data ownership and lifecycle; APIs, events, and integrations; empty, invalid, and failure behavior; privacy/security; migration and compatibility; operations, observability, reliability, and performance. Record each surface as **evidence found**, **not applicable with reason**, or **unresolved**. This is a coverage sweep, not permission to add requirements the PRD does not imply.
 
+Assess whether the PRD describes one coherent product outcome or several distinct outcomes/initiatives, and whether its actors, constraints, and success conditions are sufficiently decided for technical refinement. If it combines independent initiatives or leaves consequential product choices unresolved, tell the user what is broad or undecided and recommend refining/splitting the PRD with `to-prd` before presenting a technical design as ready for review. Pause conclusions that depend on those choices. A technically complex but coherent and decided requirement does not need another PRD solely because implementation may be large; document the complexity and risks in the review.
+
 Before giving technical conclusions or submitting a review, stop if an identified project cannot be accessed or mapped from a confirmed source, or if a conclusion depends on unavailable evidence. Name the project, missing evidence, and what the user must provide. Do not start an index update yourself or continue with unsupported conclusions. When only a product decision remains open, state the precise decision and its consequences, give a recommendation with the condition under which it wins, and ask the smallest useful question. Ask only after checking sources; ask questions whose prerequisites are settled, preferably one at a time.
 
 ## 3. Check document capabilities before drafting or writing
@@ -41,7 +45,7 @@ Read the current Maat document catalog and inspect the actual tools available in
 - `skill_review_publish` reviews a stateful skill execution step. It is not a product document review workflow.
 - An `operational_record` for feature, bug, decision, or ADR does not create a review or PRD. Do not use an incompatible type as a substitute.
 
-If the installed Maat has no confirmed operation to store and submit the technical review, stop and report the specific missing document operation. If no confirmed operation can create and relate a new PRD version after approval, report that limitation when it becomes relevant. Do not simulate a successful submission, publish to an unrelated destination, or write a substitute file without the user's request.
+If the installed Maat supports creating a review document but not submitting it for review, create and verify the document, then present its review packet in chat and invite the user to review it there. If document creation is unavailable, present the complete packet in chat instead. Continue only with conclusions supported by available evidence; do not claim a Maat review link exists unless a review operation returns one. If no confirmed operation can create and relate a new PRD version after approval, report that limitation when it becomes relevant. Do not simulate a successful submission, publish to an unrelated destination, or write a substitute file without the user's request.
 
 ### Keep operational and documentary records distinct
 
@@ -67,7 +71,7 @@ The review must also include:
 
 For consequential technical choices, present the smallest viable set of alternatives (normally the recommended option and one credible alternative), explain trade-offs, and say what condition would make each option preferable. Do not list options you would not recommend shipping. Do not invent missing product behavior. State uncertainty and present recommendations as options, not approved decisions. Create an ADR only if discovery identifies a durable architectural decision that belongs in an ADR.
 
-Submit the review only through a confirmed Maat document/review operation. Include the original PRD identity and revision, related projects, and evidence references. Show the user the exact review identifier or link returned by Maat, then wait for the human product review. Do not create the revised PRD before approval. Treat the operation response as a receipt. Report review type, ID, revision/status, and source/project relations only when returned or independently confirmed through a supported read; prose alone does not establish a Maat relation.
+When supported, create a documentary review artifact with the original PRD identity/revision, related projects, and evidence references. Submit it through the confirmed Maat review operation only if that operation is available and accepts the artifact. Show the returned review identifier/link when one exists. If review submission is unavailable, present the document's review packet in chat and wait for the user's feedback. If document creation is unavailable, present the complete packet in chat. Chat review is a valid human review route, but it is not a Maat document/review record. In either route, do not create the revised PRD until the user explicitly approves the technical refinement. Treat tool responses as receipts; report Maat review type, ID, revision/status, and relations only when returned or independently confirmed. Do not infer approval from feedback, silence, or a `planned` operational record.
 
 ## 5. Revise only after approval
 

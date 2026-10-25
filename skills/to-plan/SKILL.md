@@ -12,6 +12,12 @@ Choose the input mode from the invocation:
 - **PRD mode:** an argument identifies a PRD document. Read it as the scope source and map its requirements to all technically necessary feature and/or bug proposals.
 - **Conversation mode:** no document argument is supplied. Use the current conversation as the request context and prepare a proposal for the needed feature or bug. Do not assume an absent PRD.
 
+## Check whether planning needs a PRD first
+
+Direct prompt or conversation-context entry is for short, well-defined requests that fit in exactly one feature or one bug/fix. Before planning, assess both scope and product readiness. If interpreting the prompt or conversation context would produce more than one feature/fix, combines distinct user journeys or initiatives, is too broad to deliver as one outcome, or leaves consequential actors, goals, constraints, or success measures undecided, do not generate any feature/fix from `to-plan`: explain the concrete signals and require the user to start with `to-prd` and capture the scope in a PRD first.
+
+Do not use an arbitrary count of requirements, components, or implementation steps as the threshold: decide whether the user's short request can be expressed as one observable outcome with one coherent set of acceptance criteria. In PRD mode, one PRD may produce multiple independently reviewable features/fixes when its requirements justify them; do not send the user back to create another PRD just because several proposals are needed. If the PRD's product intent is too ambiguous to support defensible slices, identify the unresolved decisions and recommend PRD refinement before creating operational records.
+
 ## Establish the Maat context
 
 Check the active client's Maat capabilities individually. If a SessionStart receipt is available, confirm every configured skill loaded. Its absence alone does not block operational writes: continue when the operational MCP is connected and exposes the required live operations and schemas. If the operational MCP is disconnected or a required create/link schema is missing, stop before writing and name the exact gap. Never assume a tool prefix or a capability exposed by another client.
@@ -76,19 +82,20 @@ Set or retain status `planned` for the feature/bug, plan, and checks until a hum
 
 After writes, use `operational_get` or another confirmed read operation to fetch the feature/bug, plan, and every check. Verify and report each record's ID, kind, current version/status, `feature_id` relation, and stored scope/criteria. Confirm that all records point to the same feature/bug and remain `planned` unless a human decision is independently confirmed. If a read operation is unavailable, report exactly which records or relations could not be verified; do not claim successful verification.
 
-## Optional document review
+## Prepare the review packet and choose a review route
 
-Only after operational records are read back and their IDs and relations are verified, inspect the live document review operations and schemas. Submit the feature/bug and checks (and plan only if supported) for review only when the operation explicitly accepts those record kinds/IDs and returns a review result. Capture the returned review ID/link and state. A document-review operation is optional and separate from operational record creation.
+Every feature/bug needs a self-contained review packet containing the proposal, plan, checks, source traceability, evidence, risks, and open questions. First check whether the live document workflow can create a review document and relate it to these exact operational record IDs. Create that document only when the supported schema explicitly accepts those records and returns a verifiable relation. Submit it through a Maat review operation only when that operation accepts the relevant document/record IDs. Capture returned IDs, links, and states. A review document or Maat review is distinct from operational feature/plan/check records.
 
-If document review is unavailable or does not accept these operational records, preserve the verified operational records, leave their status `planned`, and tell the user that no approval link is available. If review is submitted but pending, report `submitted`, not `approved`; report `approved` only after reading a human approval/decision from a supported source. Do not imply that a review link exists when none was returned, or that operational records themselves are documents submitted to review.
+If a review document or Maat review operation is unavailable, present the complete review packet in the chat and invite the user to review it there. Do not abandon already verified operational records or imply that a Maat review link exists. Treat the user's comments in chat as review feedback, not automatic approval; incorporate requested changes through supported updates and show the revised packet. Set an approved state only after the user explicitly approves and a supported operation can record that decision. If Maat review is submitted but pending, report `submitted`, not `approved`; confirm approval through a supported read before claiming it. Never present the operational records themselves as a documentary review.
 
 ## Regression safeguards
 
-- Operational writes are available while document review is unavailable: create and read back the feature/bug, plan, and checks; report that no approval link exists.
+- Operational writes are available while document review is unavailable: create and read back the feature/bug, plan, and checks, then present the review packet in chat and wait for the user's review.
 - Matching records already exist: reuse them, or update with the current expected version and stable operation ID; do not create duplicates.
 - A required kind, create schema, `feature_id` relation, or `planned` state cannot be supported: preflight and stop before any write, naming the missing operation/field/relation.
-- Document review is available: create and verify operational records first, then submit only supported kinds; distinguish operational `planned` state, review `submitted`, and human `approved` state.
-- Never set or claim `approved` without a human decision confirmed through a supported read.
+- Document review is available: create and verify operational records first, then create/submit only supported review artifacts; distinguish operational `planned` state, review `submitted`, and explicit human approval.
+- Chat review is used: capture feedback, update supported records, and show the revised packet; do not infer approval unless the user explicitly approves.
+- Never set or claim `approved` without an explicit human decision; record it only through a supported operation and verify the result.
 
 The review packet must make the proposal understandable without relying on unstated context. Include:
 
@@ -103,5 +110,5 @@ The review packet must make the proposal understandable without relying on unsta
 
 Before submitting, check the proposed breakdown for over-splitting and missing integration: each proposal should answer “what can a user or operator observe when this lands?” and each dependency should name the prerequisite outcome, not merely a related component. Keep the user's original requirements intact when removing an unnecessary ticket/slice.
 
-Report the verified operational IDs, kinds, versions, statuses, and `feature_id` relations; summarize source traceability and unresolved gaps. Include a review link only when the optional document-review operation returned one. Stop at the human review/approval gate. A later review response can inform record updates, but only a confirmed human decision may authorize an approved state.
+Report the verified operational IDs, kinds, versions, statuses, and `feature_id` relations; summarize source traceability and unresolved gaps. Include a review document or link only when created and returned/verified by a supported operation. Otherwise include the review packet in chat and wait for feedback. Distinguish review feedback from explicit approval; only a confirmed human decision may authorize an approved state.
 
