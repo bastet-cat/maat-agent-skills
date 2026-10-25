@@ -22,6 +22,16 @@ If Maat has no unambiguous reference to the project, do not infer it from the cu
 
 Carry forward a compact project context record (canonical repository/project identity, branch, commit SHA, evidence source, mapping time, relevant surfaces/contracts, and gaps). Reuse it only while identity and commit match; refresh it after revision changes. Persist it through Maat only in confirmed fields/relations, otherwise keep it in the proposal/report and do not claim Maat persistence.
 
+### Keep operational and documentary records distinct
+
+This skill produces a documentary PRD. Before writing, identify the actual store and operation from the active session's schema and response:
+
+- A Maat document operation creates or updates a PRD document and may return a separate review record/link. Report only the document and review states that were returned or verified.
+- Operational records such as `feature`, `bug`, `plan`, and `check` capture structured delivery work. They are not PRD documents and cannot stand in for PRD creation or documentary review.
+- Conversely, a PRD document or review does not establish that operational proposals or checks exist. Do not claim those records or relations unless verified through operational reads.
+
+If PRD document creation is unavailable, present the complete PRD proposal in the conversation and name the missing document operation. Do not stop factual analysis because an operational workflow is unavailable, and do not create an operational feature/bug/plan/check as a substitute for the requested PRD. If the user separately asks to break the PRD into implementation proposals, hand that stage to `to-plan` and verify its operational records independently. Absence of one store's capability is a gap for that store only; it does not prove that the other store is absent or interchangeable.
+
 ## Understand the request and form the PRD
 
 In document mode, resolve the URL or local path, read the document without editing it, and record its title, stable ID or path, revision marker, goals, requirements, constraints, and references. If it cannot be read or identifies multiple possible sources, ask for the missing access or identifier and stop.

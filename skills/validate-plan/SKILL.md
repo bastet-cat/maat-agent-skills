@@ -15,6 +15,17 @@ If Maat has no unambiguous reference for the target project, ask the user for th
 
 Carry forward a project context record (canonical repository/project identity, branch, commit SHA, evidence source, mapping time, relevant surfaces/contracts, unresolved gaps). Reuse it only for the same identity and commit; refresh it when either changes. Distinguish structured Maat context from a map carried in the report.
 
+### Identify each memory store before assessing links
+
+Maat's operational memory and documentary memory are separate evidence sources. Inspect the live tool/schema and the returned item to classify each source; never infer its store or identity from a title, matching text ID, or search result alone.
+
+- Operational records (for example feature/bug, plan, check, and validation) carry structured work state and relations. Verify their IDs, versions, statuses, and links through operational reads.
+- Documentary records (for example PRDs, reviews, decisions, and brain documents) carry source or review material. Verify their IDs, revisions, and links through the corresponding document operations.
+- A record in one store does not prove a matching record, relation, review, approval, or check exists in the other. Join evidence across stores only through an explicit relation confirmed by a supported read.
+- `planned` means operational planning state, not documentary review submission or human approval. `submitted` means a review was routed, not approved. Require a confirmed human decision before treating a gate as complete.
+
+If one store is unavailable, mark only evidence that depends on that store as unknown or blocked; continue independent checks supported by the other store. Do not let the absence of documentary review erase verified operational records, or let operational records stand in for missing documents/review. Missing evidence is never a pass.
+
 ## Assess plan readiness
 
 Build and inspect a traceability chain for every material need:

@@ -43,6 +43,12 @@ Read the current Maat document catalog and inspect the actual tools available in
 
 If the installed Maat has no confirmed operation to store and submit the technical review, stop and report the specific missing document operation. If no confirmed operation can create and relate a new PRD version after approval, report that limitation when it becomes relevant. Do not simulate a successful submission, publish to an unrelated destination, or write a substitute file without the user's request.
 
+### Keep operational and documentary records distinct
+
+The source PRD, technical review, and revised PRD are documentary artifacts. Operational `feature`/`bug`, `plan`, and `check` records describe executable work; they cannot substitute for any of those documents, for a documentary review, or for its approval. Likewise, a PRD or technical-review document does not prove operational feature/bug/check records exist.
+
+Before reporting a document, review, or operational relation, identify its store from the live schema and verify it through a supported read. A `planned` operational status is not a review submission or approval. A review receipt is not approval until a human decision is confirmed. If the document review or revision workflow is missing, report that precise gap and keep conclusions within the available evidence; do not try to route the technical review through `operational_record`. If operational records are absent or unavailable, report that separately and do not let it invalidate a document review that is otherwise supported.
+
 Before preparing the review, summarize in clear language what the PRD asks for, which project/revision was inspected, the affected surfaces, the technical interpretation, scope boundaries, evidence versus inference, and open decisions. Carry forward confirmation already given for the same PRD revision, project revision, and scope; do not ask the same understanding question again. Ask only when new evidence materially changes the interpretation or a consequential ambiguity remains. Incorporate corrections before writing or submitting; product review remains a separate gate.
 
 ## 4. Prepare the technical review
