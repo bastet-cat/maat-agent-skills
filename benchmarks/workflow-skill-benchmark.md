@@ -9,7 +9,7 @@
 
 As três stacks cobrem o ciclo completo, mas otimizam pontos diferentes:
 
-- **Maat** tem o melhor encaixe documental e de governança para o próprio produto: PRD, feature/bug, revisão, decisão, ADR, validação e blocker. Seu fluxo ainda depende de recursos de Maat que o catálogo local marca como propostos, em especial `prd` e `check`.
+- **Maat** tem o melhor encaixe documental e de governança para o próprio produto: scope, feature/bug, revisão, decisão, ADR, validação e blocker. Seu fluxo ainda depende de recursos de Maat que o catálogo local marca como propostos, em especial `scope` e `check`.
 - **TLC** apresenta o contrato mais rigoroso contra lacunas de requisitos: separa descoberta, planejamento e implementação; exige critérios observáveis; e `tlc-spec-lean` fecha com verificação independente. É a referência mais forte para completude e prova por check.
 - **Matt Pocock/Grill** tem a decomposição de execução mais operacional para trabalho que atravessa sessões: `to-tickets` produz fatias verticais com dependências explícitas, e `implement-spec` executa a fronteira disponível em worktrees. Traz dependência de tracker e harness e registra limitações conhecidas, como colisões e custo de code review amplo.
 
@@ -27,10 +27,10 @@ Os valores são aproximações qualitativas, não medições, e a incerteza razo
 
 | Etapa do fluxo | Maat | TLC | Matt Pocock/Grill | Sinal que sustenta a estimativa |
 | --- | ---: | ---: | ---: | --- |
-| Capturar o anseio e escolher entre entrada curta ou PRD | 95% | **97%** | 94% | `to-prd` investiga situação, usuário, workaround, resultado e alternativas. A entrada direta de `to-plan` agora exige exatamente uma feature/fix; pedidos maiores voltam para PRD. TLC Discover ordena situação→problema→veredito; Grill esclarece termos e decisões, sobretudo em mudanças dentro de repositório. |
-| Formalizar a necessidade em PRD | **95%** | 94% | **95%** | Maat liga requisitos à origem e faz cobertura final; TLC transforma descoberta em design vertical; Matt `to-spec` sintetiza decisões. TLC e Matt não produzem exatamente o mesmo tipo de PRD de produto, então a comparação é aproximada. |
-| Refinar tecnicamente o PRD e revisar | **96%** | **96%** | 92% | `to-tech-plan` exige evidência por superfície, identifica escopo amplo e separa inferência de requisito. O pacote pode ser revisto por documento Maat ou no chat. `tlc-plan` fundamenta critérios no código; o fluxo Matt separa refinamento e tickets. |
-| Decompor o PRD em feature(s)/fix(es) e checks | **97%** | **97%** | 95% | `to-plan` rastreia requisito→feature/bug→critério→check; com PRD pode gerar várias propostas justificadas. Direto por prompt/contexto, limita a uma proposta e exige PRD se resultar mais de uma. TLC Plan recusa critérios inventados; `to-tickets` cria tickets verticais e dependências. A nota não mede sucesso das gravações no Maat. |
+| Capturar o anseio e escolher entre entrada curta ou scope | 95% | **97%** | 94% | `to-scope` investiga situação, usuário, workaround, resultado e alternativas. A entrada direta de `to-plan` agora exige exatamente uma feature/fix; pedidos maiores voltam para scope. TLC Discover ordena situação→problema→veredito; Grill esclarece termos e decisões, sobretudo em mudanças dentro de repositório. |
+| Formalizar a necessidade em scope | **95%** | 94% | **95%** | Maat liga requisitos à origem e faz cobertura final; TLC transforma descoberta em design vertical; Matt `to-spec` sintetiza decisões. TLC e Matt não produzem exatamente o mesmo tipo de documento de escopo de produto, então a comparação é aproximada. |
+| Refinar tecnicamente o scope e revisar | **96%** | **96%** | 92% | `to-tech-plan` exige evidência por superfície, identifica escopo amplo e separa inferência de requisito. O pacote pode ser revisto por documento Maat ou no chat. `tlc-plan` fundamenta critérios no código; o fluxo Matt separa refinamento e tickets. |
+| Decompor o scope em feature(s)/fix(es) e checks | **97%** | **97%** | 95% | `to-plan` rastreia requisito→feature/bug→critério→check; com scope pode gerar várias propostas justificadas. Direto por prompt/contexto, limita a uma proposta e exige scope se resultar mais de uma. TLC Plan recusa critérios inventados; `to-tickets` cria tickets verticais e dependências. A nota não mede sucesso das gravações no Maat. |
 | Revisar a proposta e confirmar prontidão | 96% | **97%** | 93% | `validate-plan` reconstrói a cadeia da fonte à evidência; propostas podem ser revistas por fluxo documental ou no chat, mantendo feedback separado de aprovação. TLC exige critérios observáveis; o fluxo Matt inclui aprovação de spec/tamanho e revisão, mas não o mesmo validador independente por requisito. |
 | Implementar sem desviar do objetivo aprovado | 92% | **96%** | 94% | Maat vincula implementação à proposta aprovada e aos checks; TLC congela obrigações e usa checks como contrato de execução; Matt executa tickets em grafo ligados à spec. A nota mede preservação da intenção, não velocidade nem qualidade do código. |
 | Validar checks e desbloquear requisitos | N/D | **98%** | 92% | O fluxo-alvo do Maat prevê `validate-checks`, mas essa skill não existe neste checkout; `validate-plan` verifica prontidão do plano e não comprova execução dos checks. TLC exige verificador independente por check. A documentação Matt consultada não impõe o mesmo veredito independente contra cada obrigação da spec. |
@@ -41,9 +41,9 @@ Os valores são aproximações qualitativas, não medições, e a incerteza razo
 
 ### Maat
 
-O pacote atual separa criação do PRD (`to-prd`), refinamento técnico (`to-tech-plan`), decomposição em feature/bug (`to-plan`), prontidão (`validate-plan`) e execução (`to-implement`). As skills exigem evidência de projeto/documento, preservam a revisão e decisão humanas e evitam inventar operações de escrita. `to-plan` limita a entrada direta a uma feature/fix, recomenda o PRD se o prompt ou contexto exigir mais propostas, mapeia checks a critérios de aceite e interrompe a gravação de checks se não houver operação confirmada para associá-los. A revisão pode ocorrer em documento Maat ou no chat, sem tratar feedback como aprovação.
+O pacote atual separa criação do scope (`to-scope`), refinamento técnico (`to-tech-plan`), decomposição em feature/bug (`to-plan`), prontidão (`validate-plan`) e execução (`to-implement`). As skills exigem evidência de projeto/documento, preservam a revisão e decisão humanas e evitam inventar operações de escrita. `to-plan` limita a entrada direta a uma feature/fix, recomenda o scope se o prompt ou contexto exigir mais propostas, mapeia checks a critérios de aceite e interrompe a gravação de checks se não houver operação confirmada para associá-los. A revisão pode ocorrer em documento Maat ou no chat, sem tratar feedback como aprovação.
 
-O catálogo local informa que `prd` é proposto e não implementado; `check` também é proposto, enquanto `validation` é implementado. O documento de fluxos ressalta que os tipos reconhecidos não garantem todas as interações descritas e que revisão de produto é diferente de code review. Portanto, a maior vantagem de desenho do Maat ainda não se traduz em ponta a ponta enquanto essas integrações não forem confirmadas.
+O catálogo local deve tratar `scope` como o documento de escopo de produto; confirme no servidor vivo se `scope`/`check` estão implementados — `validation` já é. O documento de fluxos ressalta que os tipos reconhecidos não garantem todas as interações descritas e que revisão de produto é diferente de code review. Portanto, a maior vantagem de desenho do Maat ainda não se traduz em ponta a ponta enquanto essas integrações não forem confirmadas.
 
 ### Tech Leads Club
 
@@ -57,7 +57,7 @@ O catálogo local informa que `prd` é proposto e não implementado; `check` tam
 
 | Stack | Melhor uso | Limite principal |
 | --- | --- | --- |
-| Maat | Trabalho governado por documentos do Maat, com revisão/decisão humana e rastreabilidade de PRD a validação. | Integrações PRD/check ainda propostas no catálogo; é necessário confirmar operações vivas antes de prometer publicação completa. |
+| Maat | Trabalho governado por documentos do Maat, com revisão/decisão humana e rastreabilidade de scope a validação. | Integrações scope/check ainda propostas no catálogo; é necessário confirmar operações vivas antes de prometer publicação completa. |
 | TLC | Descoberta difícil, proteção contra requisitos inventados, critérios observáveis e verificação independente. | Fluxo genérico de artefatos; pouca integração com tipos de documento e relações específicos do Maat. |
 | Matt Pocock/Grill | Alinhamento de domínio e execução em várias sessões/tickets com dependências e paralelismo. | Mais dependente de tracker/configuração/harness; tickets paralelos e code review final podem aumentar coordenação e retrabalho. |
 
@@ -66,8 +66,8 @@ O catálogo local informa que `prd` é proposto e não implementado; `check` tam
 O fluxo completo desejado para transformar uma necessidade em requisitos atendidos é:
 
 ```text
-[anseio do solicitante] → to-prd → [PRD] → to-spec-plan
-→ [PRD com refinamento técnico] → to-plan
+[anseio do solicitante] → to-scope → [scope] → to-tech-plan
+→ [scope com refinamento técnico] → to-plan
 → [feature(s)/fixe(s) + checks] → to-implement[] → [changes]
 → validate-checks → [desbloqueio dos requisitos]
 ```
@@ -80,22 +80,22 @@ Para pedidos curtos e decididos que cabem em uma única feature ou fix, o usuár
 → validate-checks → [desbloqueio do requisito]
 ```
 
-Essa entrada direta não deve gerar várias propostas. Se interpretar o prompt direto ou o contexto da conversa levar a mais de uma feature/fix, abranger resultados independentes ou revelar escopo de produto não decidido, `to-plan` não gera nenhuma proposta e exige que o usuário comece por `to-prd`, registrando o escopo em um PRD. No caminho completo via PRD, `to-plan` pode gerar múltiplas features/fixes quando os requisitos justificarem essa decomposição.
+Essa entrada direta não deve gerar várias propostas. Se interpretar o prompt direto ou o contexto da conversa levar a mais de uma feature/fix, abranger resultados independentes ou revelar escopo de produto não decidido, `to-plan` não gera nenhuma proposta e exige que o usuário comece por `to-scope`, registrando o escopo em um documento `scope`. No caminho completo via scope, `to-plan` pode gerar múltiplas features/fixes quando os requisitos justificarem essa decomposição.
 
-Cada etapa tem uma saída que vira a entrada rastreável da seguinte: `to-prd` formaliza o anseio como PRD; `to-spec-plan` acrescenta o refinamento técnico sem mudar a intenção do produto; `to-plan` decompõe o PRD refinado em features/fixes com critérios e checks; `to-implement` entrega as mudanças; `validate-checks` confirma os checks e registra evidências para desbloquear os requisitos correspondentes.
+Cada etapa tem uma saída que vira a entrada rastreável da seguinte: `to-scope` formaliza o anseio como scope; `to-spec-plan` acrescenta o refinamento técnico sem mudar a intenção do produto; `to-plan` decompõe o scope refinado em features/fixes com critérios e checks; `to-implement` entrega as mudanças; `validate-checks` confirma os checks e registra evidências para desbloquear os requisitos correspondentes.
 
 No checkout atual, os nomes equivalentes mais próximos são `to-tech-plan` para `to-spec-plan` e `validate-plan` para `validate-checks`. Essa equivalência é apenas de intenção: `validate-plan` avalia completude e prontidão do plano e não substitui a validação de checks de implementação. `to-spec-plan` e `validate-checks` não existem ainda com esses IDs neste repositório. O fluxo acima é o estado-alvo; não deve ser descrito como já automatizado até que as skills, relações entre artefatos e operações de validação estejam implementadas e confirmadas no Maat.
 
-1. Usar `to-prd` para investigar e registrar o problema, os usuários, os resultados esperados e as decisões de produto; se o anseio ainda estiver amplo ou ambíguo, não pular essa etapa.
-2. Usar `to-spec-plan` para mapear impactos e contratos técnicos no projeto e devolver um PRD refinado para revisão humana. A revisão pode ocorrer por um fluxo documental Maat ou diretamente no chat; feedback não é aprovação até que o responsável a confirme explicitamente.
+1. Usar `to-scope` para investigar e registrar o problema, os usuários, os resultados esperados e as decisões de produto; se o anseio ainda estiver amplo ou ambíguo, não pular essa etapa.
+2. Usar `to-spec-plan` para mapear impactos e contratos técnicos no projeto e devolver um scope refinado para revisão humana. A revisão pode ocorrer por um fluxo documental Maat ou diretamente no chat; feedback não é aprovação até que o responsável a confirme explicitamente.
 3. Usar `to-plan` para manter rastreabilidade requisito→feature/bug→critério→check. Cada proposta deve ser um resultado observável, sem sobre-decomposição.
 4. Usar `to-implement` somente após aprovação do escopo aplicável e implementar as features/fixes aprovadas, preservando relações com os checks.
 5. Usar `validate-checks` após as mudanças para executar/verificar cada check, registrar resultado e evidência, e desbloquear somente os requisitos cujos checks passaram. Falha, ausência de evidência ou check não executado não desbloqueia requisito.
-6. Confirmar no Maat os IDs, estados e relações nativas entre PRD, refinamento técnico, features/fixes, checks, mudanças e validações antes de declarar o fluxo ponta a ponta concluído.
+6. Confirmar no Maat os IDs, estados e relações nativas entre scope, refinamento técnico, features/fixes, checks, mudanças e validações antes de declarar o fluxo ponta a ponta concluído.
 
 ## Como transformar este benchmark em medição empírica
 
-Para um piloto exploratório, executar as três composições sobre pelo menos seis solicitações anonimizadas: ideia ambígua, PRD multi-feature, bug reproduzível, bug de causa incerta, mudança transversal com dependências e feature simples de uma sessão. Preservar as mesmas fontes, snapshots de código, configuração do modelo e ferramentas disponíveis, mas respeitar os destinos próprios de cada stack. Congelar e registrar os releases das skills e a rubrica usada. Avaliar os artefatos sem identificar a stack para os revisores.
+Para um piloto exploratório, executar as três composições sobre pelo menos seis solicitações anonimizadas: ideia ambígua, scope multi-feature, bug reproduzível, bug de causa incerta, mudança transversal com dependências e feature simples de uma sessão. Preservar as mesmas fontes, snapshots de código, configuração do modelo e ferramentas disponíveis, mas respeitar os destinos próprios de cada stack. Congelar e registrar os releases das skills e a rubrica usada. Avaliar os artefatos sem identificar a stack para os revisores.
 
 Use como resultado primário uma classificação binária por caso e etapa: **interpretação correta** quando não há omissão material, distorção do objetivo, escopo inventado ou decisão incerta apresentada como fato; caso contrário, **incorreta**. Dois revisores independentes aplicam essa regra sem conhecer a stack e resolvem divergências com evidência. Reporte taxa, denominador e intervalo de confiança por etapa. Use esta rubrica secundária 0–2 para explicar falhas (ausente, parcial, correto/completo):
 
@@ -110,6 +110,6 @@ Além do score, contar requisitos omitidos, inferências apresentadas como fatos
 
 ## Fontes
 
-- Fontes locais Maat: `skills/to-prd/SKILL.md`, `skills/to-tech-plan/SKILL.md`, `skills/to-plan/SKILL.md`, `skills/validate-plan/SKILL.md`, `skills/to-implement/SKILL.md` neste checkout; catálogo e levantamento documental em `/home/euclides.okamoto/orca/workspaces/maat/cetacean/docs/maat-docs.md` e `/home/euclides.okamoto/orca/workspaces/maat/cetacean/docs/skill-stack-workflows.md`.
+- Fontes locais Maat: `skills/to-scope/SKILL.md`, `skills/to-tech-plan/SKILL.md`, `skills/to-plan/SKILL.md`, `skills/validate-plan/SKILL.md`, `skills/to-implement/SKILL.md` neste checkout; catálogo e levantamento documental em `/home/euclides.okamoto/orca/workspaces/maat/cetacean/docs/maat-docs.md` e `/home/euclides.okamoto/orca/workspaces/maat/cetacean/docs/skill-stack-workflows.md`.
 - TLC: [TLC Discover](https://agent-skills.techleads.club/skills/tlc-discover/), [TLC Plan](https://agent-skills.techleads.club/skills/tlc-plan/), [TLC Spec Lean](https://agent-skills.techleads.club/skills/tlc-spec-lean/) e [TLC Implement](https://agent-skills.techleads.club/skills/tlc-implement/).
 - Matt Pocock: [grill-with-docs](https://github.com/mattpocock/skills/blob/main/docs/engineering/grill-with-docs.md), [to-spec](https://github.com/mattpocock/skills/blob/main/docs/engineering/to-spec.md), [to-tickets](https://github.com/mattpocock/skills/blob/main/docs/engineering/to-tickets.md), [implement](https://github.com/mattpocock/skills/blob/main/skills/engineering/implement/SKILL.md) e [implement-spec](https://github.com/mattpocock/skills/blob/main/skills/engineering/implement-spec/SKILL.md).
