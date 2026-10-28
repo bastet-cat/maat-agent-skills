@@ -11,6 +11,10 @@ This is technical discovery and refinement before executable planning or impleme
 
 This skill does not create feature/bug/plan/check **product documents**. It prepares a technical review and, after explicit approval, a refined scope document. Use `to-plan` after the product scope and technical refinement are ready when the user wants executable feature/bug documents.
 
+## Required agent mode
+
+Run this skill only in the agent's Plan mode. At invocation, confirm that Plan mode is active and keep it active through technical analysis, review preparation, approved scope refinement, Maat writes, and validation. If the agent is in another mode, switch to Plan mode before continuing; if the runtime does not expose a mode switch, stop before doing the technical planning work and ask the user to relaunch or switch the agent to Plan mode. Do not continue this workflow in another mode.
+
 ## Maat session contract
 
 Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Handshake before any Maat write.
