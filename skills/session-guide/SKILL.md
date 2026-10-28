@@ -24,14 +24,19 @@ For repository work, confirm project identity and revision from explicit Maat re
 
 ## Navigate the codebase
 
-Prefer Maat Codebase Memory navigation tools over shell text-search commands when exploring a repository:
+Prefer Maat Codebase Memory when exploring a repository. It combines ranked full-text search over an indexed snapshot with indexed symbol records and an observed relationship graph. Language plugins (for example, `maat-codebase-golang`) can contribute parser-derived symbols and AST relationships such as calls and imports. This is more than shell text search: it can return compact, revision-aware evidence. Do not describe every Maat lookup as semantic or AST-based; preserve the retrieval method and provenance returned by each tool.
 
-1. Use `codebase_find` to locate files, symbols, routes, handlers, and configuration.
-2. Use `codebase_how` to understand modules, entrypoints, and flows.
-3. Use `codebase_context` and `codebase_evidence` to inspect a result and its supporting source evidence.
-4. Use `workspace_search` for literal or structural text searches across the indexed snapshot.
+Use the MCP methods according to the question:
 
-Do not default to `grep`, `rg`, or `pgrep` for repository navigation. Use them only when the needed file or text is not represented in Codebase Memory (for example, an unindexed or newly created local file), or when a Maat navigation tool is unavailable or cannot answer the question. Check `codebase_status` first when results may be stale; do not treat an unavailable or stale index as current evidence. Clearly label any shell-search result as local checkout evidence.
+- `workspace_search(query)`: canonical search over the indexed snapshot, using ranked full-text results (FTS BM25) with freshness information, pagination, and compact snippets. Prefer it for repository text search; queries are ranked against indexed records, not searched by shell tools.
+- `codebase_find(query)`: “where is this?” lookup for files, symbols, routes, handlers, and configuration. Results can be textual or parser-backed; check and preserve the returned `method` rather than assuming semantic search or AST provenance.
+- `codebase_how(module?)`: evidence-backed summaries of modules, entrypoints, and execution flows; omit `module` for a repository overview.
+- `codebase_context(key)`: inspect a file, symbol, or indexed key with its record, adjacent relationships, and evidence. Use parser/AST relationships when present; label the result's provenance method.
+- `codebase_evidence(key)`: retrieve supporting source paths, line ranges, and provenance, including whether evidence is textual or AST-derived when that metadata is returned.
+- `codebase_impact(target)` and `codebase_trace(from, to)`: inspect direct observed dependency impact or graph paths between mapped nodes. Keep observed AST edges distinct from inferred impacts and paths.
+- `codebase_status(path, branch)` and, when needed, `codebase_update(...)`: establish snapshot freshness and wait for indexing to finish before citing indexed structure.
+
+Do not default to `grep`, `rg`, or `pgrep` for repository navigation. Use shell search only when the needed file or text is not represented in Codebase Memory (for example, an unindexed or newly created local file), or when a Maat method is unavailable or cannot answer the question. Check `codebase_status` first when results may be stale; do not treat an unavailable or stale index as current evidence. Clearly label any shell-search result as local checkout evidence.
 
 If Maat has no unambiguous project reference, ask the user for the repository URL and intended branch/access. After they provide it, clone into an isolated workspace and map the codebase at the checked-out commit. Label that as direct checkout evidence, not Codebase Memory evidence; state separately which Maat operational context is still unknown. Never present an unavailable or stale index as current evidence, request credentials in chat, or start an index update yourself.
 

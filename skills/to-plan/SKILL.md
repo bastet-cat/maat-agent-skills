@@ -7,6 +7,10 @@ description: Turn decided product requirements into evidence-grounded Maat featu
 
 Use this skill when asked to plan/specify a sigle feature or fix, including “planeje a feature {x}”, “monte um plano”, or “especifique um feature/bug”. Keep the result as a proposal for human review. Do not implement it or record an unapproved decision.
 
+## Required agent mode
+
+Run this skill only in the agent's Plan mode. At invocation, confirm that Plan mode is active and keep it active through evidence gathering, proposal preparation, and review-packet creation. If the agent is in another mode, switch to Plan mode before continuing; if the runtime does not expose a mode switch, stop before doing the planning work and ask the user to relaunch or switch the agent to Plan mode. Do not continue this workflow in another mode.
+
 Choose the input mode from the invocation:
 
 - **Scope mode:** an argument identifies a scope document. Read it as the product-scope source and map its requirements to all technically necessary feature and/or bug proposals.
