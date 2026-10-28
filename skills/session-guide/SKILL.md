@@ -9,7 +9,7 @@ Use Maat's published skill registry and Codebase Memory as the source of operati
 
 ## Maat session contract
 
-Before Maat-dependent work, follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md` in this package. When skill `maat-session-bootstrap` is `published` with a non-empty `active_release_id`, load that release via the bootstrap discovery procedure and prefer its copies of those references. If discovery fails closed, use the local references. Never continue on partial discovery success.
+Before Maat-dependent work, follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md` in this package. Never continue on partial discovery success.
 
 ## Check session initialization
 
@@ -21,6 +21,17 @@ Before Maat-dependent work, follow `references/maat-mcp-bootstrap.md` and `refer
 ## Select repository context
 
 For repository work, confirm project identity and revision from explicit Maat references with `codebase_status`. Use `workspace_search` for structural searches when available and verify that the returned snapshot matches the requested revision. Never infer that the current checkout is the target from its directory name, open tabs, or a similar project name.
+
+## Navigate the codebase
+
+Prefer Maat Codebase Memory navigation tools over shell text-search commands when exploring a repository:
+
+1. Use `codebase_find` to locate files, symbols, routes, handlers, and configuration.
+2. Use `codebase_how` to understand modules, entrypoints, and flows.
+3. Use `codebase_context` and `codebase_evidence` to inspect a result and its supporting source evidence.
+4. Use `workspace_search` for literal or structural text searches across the indexed snapshot.
+
+Do not default to `grep`, `rg`, or `pgrep` for repository navigation. Use them only when the needed file or text is not represented in Codebase Memory (for example, an unindexed or newly created local file), or when a Maat navigation tool is unavailable or cannot answer the question. Check `codebase_status` first when results may be stale; do not treat an unavailable or stale index as current evidence. Clearly label any shell-search result as local checkout evidence.
 
 If Maat has no unambiguous project reference, ask the user for the repository URL and intended branch/access. After they provide it, clone into an isolated workspace and map the codebase at the checked-out commit. Label that as direct checkout evidence, not Codebase Memory evidence; state separately which Maat operational context is still unknown. Never present an unavailable or stale index as current evidence, request credentials in chat, or start an index update yourself.
 

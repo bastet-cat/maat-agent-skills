@@ -9,7 +9,7 @@ Use this skill to assess a proposed scope document, feature, bug/fix, or set of 
 
 ## Maat session contract
 
-Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Prefer published `maat-session-bootstrap` when discoverable; otherwise use local references. Handshake before any Maat write (this skill is usually read-only).
+Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Handshake before any Maat write (this skill is usually read-only).
 
 ## Load the source and evidence
 

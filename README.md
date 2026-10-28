@@ -62,7 +62,6 @@ usable Maat registry release.
 
 | Skill | Purpose |
 | --- | --- |
-| [`maat-session-bootstrap`](skills/maat-session-bootstrap/SKILL.md) | Shared Maat MCP 2026 discovery/transport contract and agent↔human friction rules; cited by flow skills. |
 | [`session-guide`](skills/session-guide/SKILL.md) | Guide Maat session checks, repository context, and skill assets. |
 | [`to-tech-plan`](skills/to-tech-plan/SKILL.md) | Analyze a scope document against indexed Maat projects, prepare technical refinement for review, and revise it after approval. |
 | [`to-scope`](skills/to-scope/SKILL.md) | Turn a source document or conversation into a scope document (`type=scope`) and publish it through supported Maat document workflows. |

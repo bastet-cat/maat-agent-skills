@@ -13,7 +13,7 @@ This skill does not create feature/bug/plan/check **product documents**. It prep
 
 ## Maat session contract
 
-Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Prefer published `maat-session-bootstrap` when discoverable; otherwise use local references. Handshake before any Maat write.
+Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Handshake before any Maat write.
 
 ## 1. Read the source
 

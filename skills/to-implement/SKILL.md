@@ -9,7 +9,7 @@ Use this skill to implement an approved feature or bug/fix in the current reposi
 
 ## Maat session contract
 
-Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Prefer published `maat-session-bootstrap` when discoverable; otherwise use local references. Handshake before any Maat write. Offer ≤3 options with a default when the path forks; never assume commit or push.
+Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Handshake before any Maat write. Offer ≤3 options with a default when the path forks; never assume commit or push.
 
 ## Confirm the work is ready
 

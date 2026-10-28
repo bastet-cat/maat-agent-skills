@@ -14,7 +14,7 @@ Choose the source from the invocation:
 
 ## Maat session contract
 
-Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Prefer loading published `maat-session-bootstrap` via discovery when available; otherwise use the local references. Handshake before any Maat write.
+Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Handshake before any Maat write.
 
 ## Establish the Maat context
 

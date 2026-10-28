@@ -14,7 +14,7 @@ Choose the input mode from the invocation:
 
 ## Maat session contract
 
-Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Prefer published `maat-session-bootstrap` when discoverable; otherwise use local references. Handshake before any Maat write.
+Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Handshake before any Maat write.
 
 ## Check whether planning needs a scope document first
 
