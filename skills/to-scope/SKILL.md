@@ -7,9 +7,9 @@ description: Turn a source document or the current conversation into a Maat scop
 
 Use this skill for requests such as “faça uma mudança no produto {x}”, “altere o produto”, “corrija o produto”, or “crie no produto”. Produce a **scope** document proposal (`type=scope`); do not implement product changes or record an unapproved decision.
 
-## Required agent mode
+## Agent mode
 
-Run this skill only in the agent's Plan mode. At invocation, confirm that Plan mode is active and keep it active through source analysis, scope preparation, Maat writes, and validation. If the agent is in another mode, switch to Plan mode before continuing; if the runtime does not expose a mode switch, stop before doing the scoping work and ask the user to relaunch or switch the agent to Plan mode. Do not continue this workflow in another mode.
+Run this workflow in the current agent mode. Do not require, check for, or switch to a particular mode. Follow the source, review, and authorization requirements below regardless of mode.
 
 Choose the source from the invocation:
 

@@ -7,9 +7,9 @@ description: Analyze a repository's architecture and quality, then create eviden
 
 Analyze the selected repository and create or update its project documentation in Maat's document memory. The expected deliverables are `backlog`, `workflow`, `conventions`, and `configs`; after validating them, create a complete document of type `project`.
 
-## Required agent mode
+## Agent mode
 
-Run this skill only in the agent's Plan mode. At invocation, confirm that Plan mode is active and keep it active through repository analysis, document preparation, Maat writes, and validation. If the agent is in another mode, switch to Plan mode before continuing; if the runtime does not expose a mode switch, stop before doing the documentation work and ask the user to relaunch or switch the agent to Plan mode. Do not continue this workflow in another mode.
+Run this workflow in the current agent mode. Do not require, check for, or switch to a particular mode. Follow the evidence, review, and authorization requirements below regardless of mode.
 
 ## Establish repository evidence
 
