@@ -68,6 +68,7 @@ usable Maat registry release.
 | [`to-plan`](skills/to-plan/SKILL.md) | Decompose a scope document or conversation into feature/bug proposals with linked validation checks for human review. |
 | [`validate-plan`](skills/validate-plan/SKILL.md) | Assess whether a Maat proposal and its linked checks are complete, traceable, and ready for review or implementation. |
 | [`to-implement`](skills/to-implement/SKILL.md) | Implement an approved Maat feature or bug using linked checks and record validation evidence. |
+| [`ship`](skills/ship/SKILL.md) | Prepare completed Maat implementation work for commit, push, or pull request with verified validation evidence. |
 | [`diff-review`](skills/diff-review/SKILL.md) | Review PR and Git diffs for high-confidence bugs. |
 | [`owasp-top-10`](skills/owasp-top-10/SKILL.md) | Review OWASP skill security controls that remain unverified by Maat's static scanner. |
 
