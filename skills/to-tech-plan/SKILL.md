@@ -81,6 +81,12 @@ For consequential technical choices, present the smallest viable set of alternat
 
 When supported, create a documentary review artifact with the original scope identity/revision, related projects, and evidence references. Submit it through the confirmed Maat review operation only if that operation is available and accepts the artifact. Show the returned review identifier/link when one exists. If review submission is unavailable, present the document's review packet in chat and wait for the user's feedback. If document creation is unavailable, present the complete packet in chat. Chat review is a valid human review route, but it is not a Maat document/review record. In either route, do not create the revised scope document until the user explicitly approves the technical refinement. Treat tool responses as receipts; report Maat review type, ID, content SHA/status, and relations only when returned or independently confirmed. Do not infer approval from feedback, silence, or an operational draft.
 
+### Required review fields and read-back
+
+The technical artifact is also a `type=review`; every created review must include a non-empty `alternatives` array naming the exact technical refinement decision(s) the owner can approve, plus populated `tags` for discovery (for example `["<ticket>", "<area>", "review"]`). The Maat UI uses `alternatives` to show what can be approved; without it, the owner may find nothing to approve. Include supported `related` links to the source scope and evidence documents. Example: `["Aprovar o refinamento técnico da scope <X>, incluindo os critérios <A1–A3>"]`.
+
+Pass `alternatives` and `tags` on every review `brain_create` and `brain_update`. Since `brain_update` replaces fields, every review update must resend `alternatives`, `tags`, `related`, `title`, and `body`; never omit one of these fields. After creating or updating the review, call `brain_get` and assert `type=review`, `status=proposed`, non-empty `alternatives`, and populated `tags`. If read-back fails or a required field is empty, report the exact path and failure; do not claim the technical review is ready for approval.
+
 ## 5. Revise only after approval
 
 When the human reviewer responds:

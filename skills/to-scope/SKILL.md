@@ -78,6 +78,12 @@ Create the scope document through the confirmed Maat operation, preserving the s
 
 If a human review operation is available for a scope document, submit it through the confirmed review tools and report the returned scope and review identifiers/links. If no such operation is available, publish the scope as a proposal and state that review submission is unsupported; do not simulate a review or record a decision. Stop at human review and wait for the owner before treating proposed requirements as approved.
 
+### Create and verify the review document
+
+When the supported document workflow creates a `type=review` for the scope, `alternatives` is mandatory and must be a non-empty array naming the exact owner action(s) being proposed. The Maat UI uses `alternatives` to show what can be approved; omitting it can leave the owner with nothing to approve. Also provide non-empty discovery `tags`, for example `["<ticket>", "<area>", "review"]`, and `related` links to the scope and any evidence documents when supported. A typical option is `["Aprovar o scope <X> e os requisitos <R1–R3>"]`.
+
+On every `brain_create` or `brain_update` for a review, send `alternatives` and `tags`. Because `brain_update` replaces fields, every review update must resend `alternatives`, `tags`, `related`, `title`, and `body`; never omit one of these fields. After creating or updating the review, call `brain_get` and assert that it is `type=review`, `status=proposed`, and has a non-empty `alternatives` array (and populated `tags`). If any assertion fails or the read-back is unavailable, report the exact path and failure; do not claim the review is ready for approval.
+
 Treat each write response as an operation receipt: report only the document type (`scope`), identifier, revision/content SHA, links/relations, and review state actually returned or confirmed. On update conflicts, re-read with `brain_get` and retry with the new `expected_sha`. If the operation cannot return or verify an expected relation, state that limitation instead of implying a complete link.
 
 When the reviewer requests changes, warn if the document is already `reviewed` (edit may reopen approval as `final`), update through the same confirmed Maat workflow with `expected_sha`, preserve history/provenance, and resubmit if supported. Record a decision only after the human provides one and only through a confirmed Maat operation — not via generic `brain_update` status fields.
