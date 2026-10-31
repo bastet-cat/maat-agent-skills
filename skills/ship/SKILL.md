@@ -55,3 +55,6 @@ If GitHub CLI or another authorized PR interface is unavailable, report that lim
 ## Report
 
 Return the branch and base, commit hash(es), push status, PR URL when created, and the Maat feature/check/validation references with their actual states. Distinguish completed operations from prepared next steps. Include any files left unstaged and any validation gaps that block delivery. Never describe a change as ready for review when required evidence is missing.
+# Recheck authorization for delivery
+
+Before any requested delivery action, reread the supported review and linked artifacts and confirm that the explicit recorded decision applies to the exact current IDs and SHAs/versions. Approval for older content does not authorize delivery of changed content. Do not repeat a prompt for an already approved exact revision. If the UI appears approved but Maat reads pending, repeat reads, compare identifiers/versions, report the sync discrepancy, and stop the dependent delivery action. Never infer or synthesize a Maat decision.
