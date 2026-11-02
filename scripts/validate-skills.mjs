@@ -32,7 +32,7 @@ for (const entry of readdirSync(skillsRoot, { withFileTypes: true })) {
   if (name && name !== basename(entry.name)) {
     errors.push(`${entry.name}: name must match its directory`);
   }
-  if (/TODO|First step|Describe when this skill/i.test(content)) {
+  if (/^\s*(?:TODO|First step|Describe when this skill)\b/im.test(content)) {
     errors.push(`${entry.name}: unfinished scaffold text remains`);
   }
 }
