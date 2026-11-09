@@ -1,11 +1,11 @@
 ---
 name: to-plan
-description: Turn decided product requirements into evidence-grounded Maat feature or bug proposals with traceable checks for human review.
+description: Turn decided product requirements into evidence-grounded Maat feature or bug proposals with explicit inter-proposal dependencies, a viable parallelization map on the source scope, and traceable checks for human review.
 ---
 
 # Plan Maat implementation proposals
 
-Use this skill when asked to plan/specify a sigle feature or fix, including “planeje a feature {x}”, “monte um plano”, or “especifique um feature/bug”. Keep the result as a proposal for human review. Do not implement it or record an unapproved decision.
+Use this skill when asked to plan/specify a single feature or fix, including “planeje a feature {x}”, “monte um plano”, or “especifique um feature/bug”. Keep the result as a proposal for human review. Do not implement it or record an unapproved decision.
 
 ## Agent mode
 
@@ -41,8 +41,9 @@ Carry forward a project context record with canonical repository/project identit
 1. Resolve the provided argument as one unambiguous source document (`brain_get` for Maat paths, or file/URL tools). Read it without editing it; record its title, stable identifier or location, revision/content SHA, goals, requirements, constraints, and references. If it cannot be read or does not identify one scope document, ask for the missing path/access/identifier and stop.
 2. Trace every requirement and relevant user flow through affected projects, systems, data ownership, APIs/events, authorization, persistence, operations, and failure behavior. Distinguish direct evidence from inference and make each inference checkable.
 3. Map requirements to the smallest coherent set of proposals needed for delivery. Create a **feature** for new product behavior and a **bug** for correcting behavior that contradicts an established expectation. Do not classify work from wording alone: confirm the current behavior or cite the source that establishes the expected behavior. A scope document can yield multiple proposals, and one can cover closely related requirements.
-4. Choose boundaries by independently reviewable and verifiable outcomes. Prefer a vertical slice that demonstrates user-visible or operational value across the layers it needs. Split only when each part can be reviewed and validated independently or has a real dependency; merge parts that cannot demonstrate the intended outcome alone. Avoid one item per technical layer, duplicate proposals, and speculative scope. Write the proposed grouping and dependency edges in a concise numbered breakdown before creating documents. If the source leaves a material split/merge or dependency decision open, ask one focused question (≤3 options with default); otherwise proceed without an approval round that repeats the later product review.
-5. For each proposal, state source requirement(s), intended outcome, current/expected behavior, boundaries, affected projects/components, real dependencies, observable acceptance criteria, failure scenarios, and technical risks. Separate direct evidence, inference, recommendation, assumption, and unresolved product decision. Do not decide product questions for the owner.
+4. Choose boundaries by independently reviewable and verifiable outcomes. Prefer a vertical slice that demonstrates user-visible or operational value across the layers it needs. Split only when each part can be reviewed and validated independently or has a real dependency; merge parts that cannot demonstrate the intended outcome alone. Avoid one item per technical layer, duplicate proposals, and speculative scope. Write the proposed grouping and **dependency edges** in a concise numbered breakdown before creating documents. Every edge must name a prerequisite proposal outcome that truly blocks another; do not invent ordering for convenience. If the source leaves a material split/merge or dependency decision open, ask one focused question (≤3 options with default); otherwise proceed without an approval round that repeats the later product review.
+5. For each proposal, state source requirement(s), intended outcome, current/expected behavior, boundaries, affected projects/components, **`depends_on` prerequisites**, observable acceptance criteria, failure scenarios, and technical risks. Separate direct evidence, inference, recommendation, assumption, and unresolved product decision. Do not decide product questions for the owner.
+6. Derive the **viable parallelization map** from the dependency edges before writing documents: group proposals into the smallest set of waves such that every item in a wave has all of its `depends_on` prerequisites in earlier waves (or none). Items in the same wave may proceed in parallel during implementation. Reject cycles; if a cycle appears, merge the coupled proposals or ask one focused question to break it. Record which shared surfaces (files, schemas, contracts) would collide if parallelized so implementers can avoid false parallelism.
 
 ### Conversation mode
 
@@ -56,9 +57,27 @@ Cover every acceptance criterion with at least one check and every high-risk fai
 
 Before writing, perform a coverage pass in both directions: every source need is represented by a proposal or explicitly marked out of scope/unresolved, and every acceptance criterion has a check. Mark any exposed surface not defined by the source (for example authorization, empty/error states, migration, or operations) as existing behavior, not applicable, or unresolved; never turn the sweep into invented requirements. Identify durable architectural choices only when evidence shows one is needed. Present alternatives and trade-offs for human choice. An ADR is appropriate only for a durable architectural decision; do not turn routine implementation details into ADRs.
 
+### Dependency field (required on every feature/bug)
+
+Every feature or bug document must carry an explicit **Dependencies** section that implementers and `to-implement` can parse without reading the whole plan. Use this shape in the document body:
+
+```markdown
+## Dependencies
+- depends_on: [<logical paths or stable IDs of prerequisite features/bugs>]
+- dependency_reason: <one line per depends_on entry, or "none">
+- parallel_wave: <integer wave from the parallelization map; 1 = no blockers>
+```
+
+Rules:
+
+- `depends_on` lists only other proposals in this planning set (or already-delivered Maat proposals with verified paths). Empty list means the item can start in wave 1.
+- Reasons name the blocking outcome (contract, data, UI seam), not a vague “related work”.
+- Put every `depends_on` target path in the document's `related` array when the live schema accepts it, together with the source scope path in scope mode.
+- Plans and review packets must restate the same edges; do not let body, `related`, and the scope planning map disagree.
+
 ## Confirm the shared understanding
 
-Before creating proposal/check documents, show a concise, plain-language summary of the source goal, current behavior, intended outcome, mapped feature/bug slices, affected project and revision, linked checks, scope boundaries, evidence versus inference, and unresolved questions. Carry forward confirmation already given for the same source, project revision, and scope; do not repeat that question. Ask only if the understanding is new, materially changed, or consequentially ambiguous. Incorporate corrections before writing; human product review remains a separate gate.
+Before creating proposal/check documents, show a concise, plain-language summary of the source goal, current behavior, intended outcome, mapped feature/bug slices, **dependency edges and parallel waves**, affected project and revision, linked checks, scope boundaries, evidence versus inference, and unresolved questions. Carry forward confirmation already given for the same source, project revision, and scope; do not repeat that question. Ask only if the understanding is new, materially changed, or consequentially ambiguous. Incorporate corrections before writing; human product review remains a separate gate.
 
 ## Create and verify project documents
 
@@ -82,15 +101,22 @@ Optional staging: create an operational draft with `operational_record` (`status
 
 Create or update only the documents needed, in this order:
 
-1. **Feature or bug document:** choose feature for new behavior and bug for a correction. Record source, problem/current behavior, intended outcome, scope and exclusions, affected project/evidence, acceptance criteria, risks, dependencies, and open questions. Keep it in `draft` while the full proposal set is incomplete. Never set `reviewed`/`accepted` via `brain_create` or `brain_update`.
-2. **Plan document:** create with `feature_id` (or equivalent relation) pointing at the feature/bug document. Include delivery scope/slices, criterion coverage, evidence, dependencies, risks, and unresolved decisions. Keep it in `draft` while the full proposal set is incomplete.
+1. **Feature or bug document:** choose feature for new behavior and bug for a correction. Record source, problem/current behavior, intended outcome, scope and exclusions, affected project/evidence, acceptance criteria, risks, the required **Dependencies** field (`depends_on`, `dependency_reason`, `parallel_wave`), and open questions. Keep it in `draft` while the full proposal set is incomplete. Never set `reviewed`/`accepted` via `brain_create` or `brain_update`.
+2. **Plan document:** create with `feature_id` (or equivalent relation) pointing at the feature/bug document. Include delivery scope/slices, criterion coverage, evidence, the same dependency edges and wave assignment, risks, and unresolved decisions. Keep it in `draft` while the full proposal set is incomplete.
 3. **Check documents:** one check document per falsifiable check, each related to the same feature/bug. Every check must identify its criterion, scenario/setup and action, and observable expected result/evidence. Keep paths/IDs stable across retries.
+4. **Scope planning area (scope mode only):** after the proposal set exists, update the source scope document with `brain_update` and its current `expected_sha` so it gains or replaces a top-level **Planning** section. Do not erase unrelated scope content. The Planning section is the durable base-specification map for parallel implementation and must include:
+   - **Proposal index:** each feature/bug path, type, one-line outcome, and `parallel_wave`.
+   - **Dependency graph:** every `depends_on` edge with its reason (or an explicit “no edges” statement).
+   - **Viable parallelization map:** waves in order; for each wave, the proposals that may run in parallel and any shared-surface collision notes that force serialization inside the wave.
+   - **Stabilization rule:** parallel workstreams for this scope stay provisional until every linked proposal's validations have been checked and passed (see `to-implement` scope mode).
+
+   Read the updated scope back and verify the Planning section matches the feature/bug `Dependencies` fields and plan documents. If the scope cannot be updated, report the exact gap and keep the same map in the review packet so implementers are not blocked silently.
 
 If an unexpected write failure occurs after some documents were created, report the exact partial state and paths/SHAs; do not conceal it or recreate successful writes. Resume only missing/failed writes after reading current state.
 
 ### Read back and verify
 
-After writes, `brain_get` (or confirmed reads) for the feature/bug, plan, and every check. Verify and report each path, type, content SHA/status, and `feature_id`/related links. Confirm all documents point to the same feature/bug and that the complete set passes the coverage review. Only then use `brain_update` with each current `expected_sha` to move the feature/bug and plan to `final`. Keep checks linked and verified without inventing a lifecycle transition for them. Read the promoted documents back before creating the review. If a read is unavailable, report exactly which documents or relations could not be verified; do not claim successful verification.
+After writes, `brain_get` (or confirmed reads) for the feature/bug, plan, every check, and the updated scope Planning section in scope mode. Verify and report each path, type, content SHA/status, and `feature_id`/related/`depends_on` links. Confirm all documents point to the same feature/bug, that dependency edges and waves agree across feature/bug, plan, and scope Planning, and that the complete set passes the coverage review. Only then use `brain_update` with each current `expected_sha` to move the feature/bug and plan to `final`. Keep checks linked and verified without inventing a lifecycle transition for them. Read the promoted documents back before creating the review. If a read is unavailable, report exactly which documents or relations could not be verified; do not claim successful verification.
 
 ## Prepare the review packet and choose a review route
 
@@ -128,10 +154,11 @@ The review packet must make the proposal understandable without relying on unsta
 - technical scope, affected project evidence, boundaries, and dependencies;
 - observable acceptance criteria and relevant failure cases;
 - associated validation checks, each mapped to one or more acceptance criteria;
-- real dependency edges and why each blocker is necessary;
+- real dependency edges (`depends_on`), wave assignments, and why each blocker is necessary;
+- the scope **Planning** parallelization map (scope mode) or the same map embedded in the packet (conversation mode with multiple proposals);
 - risks, alternatives, assumptions, and questions requiring human choice.
 
-Before submitting, check the proposed breakdown for over-splitting and missing integration: each proposal should answer “what can a user or operator observe when this lands?” and each dependency should name the prerequisite outcome, not merely a related component. Keep the user's original requirements intact when removing an unnecessary ticket/slice.
+Before submitting, check the proposed breakdown for over-splitting and missing integration: each proposal should answer “what can a user or operator observe when this lands?” and each dependency should name the prerequisite outcome, not merely a related component. Confirm the parallelization map has no cycles and that every wave-1 item truly has an empty `depends_on`. Keep the user's original requirements intact when removing an unnecessary ticket/slice.
 
 Report the verified document paths, types, content SHAs, statuses, and relations; summarize source traceability and unresolved gaps. Include a review document or link only when created and returned/verified by a supported operation. Otherwise include the review packet in chat and wait for feedback. Distinguish review feedback from explicit approval; only a confirmed human decision may authorize an approved/`reviewed` state.
 # Preserve artifact boundaries and review state
