@@ -52,9 +52,15 @@ Rules:
 - If a documented gate is too narrow, widen the command or narrow the proof — do not fake pass.
 - Independent verification when `to-implement` requires it: return `READY` / `READY_WITH_GAPS` / `NOT_READY` with only real blockers.
 
+## Maat UI and resume
+
+- After every material state change, update feature/bug, plan, checks, and validations so status, tags, related links, implementation SHA, evidence, pending items, and risks match reality.
+- Read back with `brain_get` before claiming the UI or a later session can recover the work.
+- Keep scope ↔ feature/bug ↔ plan ↔ checks ↔ validations relations current; do not wait until close-out to record progress.
+
 ## Busy-human communication
 
 - Lead with a 1–2 sentence verdict.
 - Prefer short tables over prose.
 - Do not restate the task; do not list undone work unless it blocks.
-- After each milestone: **one** concrete next step, not an eight-item checklist.
+- After each milestone: execute remaining authorized work in the closed loop with `validate-plan`; do not end with a next-step backlog while remediation or re-validation is still executable. Report only a finished cycle or a true external/human blocker (for example `manual-validation`) with concrete resume instructions.

@@ -1,6 +1,6 @@
 ---
 name: to-implement
-description: Implement an approved Maat feature or bug using linked checks, or run dependency-aware parallel implementation across every approved proposal linked to a scope, then validate-plan and stabilize only after all validations pass.
+description: Implement an approved Maat feature or bug using linked checks, or run dependency-aware parallel implementation across every approved proposal linked to a scope, then close the validate-plan loop and stabilize only after all validations pass.
 ---
 
 # Implement an approved Maat proposal
@@ -59,13 +59,13 @@ For work with multiple genuinely independent slices inside one proposal, use tha
 
 Run the checks required by the proposal and repository instructions. For each check, record the actual result and evidence; do not mark an unrun or inconclusive check as passed. If a check fails, diagnose and correct within approved scope when possible, then rerun it. If it cannot pass or the fix requires a product/architecture decision, stop that part and record the blocker through a confirmed Maat operation.
 
-After the implementation, ask for an independent verification pass using a fresh context or an available independent reviewer. Give the verifier the approved proposal, linked checks, changed revision, and access to the relevant evidence; have it determine whether each check actually proves its criterion, including regressions and failure cases. The verifier must report unsupported, missing, or contradictory evidence rather than accepting the implementer's summary. Address findings within approved scope, then re-run affected checks. If an independent verifier is unavailable, report that explicitly instead of presenting self-review as independent verification. Prefer machine-readable overall labels: `READY`, `READY_WITH_GAPS`, or `NOT_READY`, with only real blockers.
+After the implementation, load and follow the published `validate-plan` skill for an independent verification pass. Prefer a fresh context or an available independent reviewer that did not author the change. Give the verifier the approved proposal, linked checks, changed revision, and access to the relevant evidence; have it determine whether each check actually proves its criterion, including regressions and failure cases. The verifier must report unsupported, missing, or contradictory evidence rather than accepting the implementer's summary. Keep the verifier packet current when the plan, checks, implementation, or results change. Address findings within approved scope, re-run affected checks, update Maat records, and re-enter `validate-plan` until every required check has a recorded outcome or only true external/`manual-validation` blockers remain. Do not stop with a list of next steps while authorized remediation is still executable. If an independent verifier is unavailable, report that explicitly instead of presenting self-review as independent verification. Prefer machine-readable overall labels: `READY`, `READY_WITH_GAPS`, or `NOT_READY`, with only real blockers.
 
 Then close the Maat record for that proposal (see **Close the Maat record**).
 
 ## Scope mode: parallel waves, validate-plan, stabilize
 
-Completion criterion for scope mode: every linked approved proposal is implemented, every linked check has a recorded outcome, `validate-plan` reports the set ready enough to proceed, and parallel workstreams are stabilized only after all validations for the set are checked and successful.
+Completion criterion for scope mode: every linked approved proposal is implemented, every linked check has a recorded outcome, the `validate-plan` closed loop reports the set ready enough to proceed (or only documented `manual-validation` gaps remain), and parallel workstreams are stabilized only after all validations for the set are checked and successful.
 
 ### 1. Schedule waves
 
@@ -81,27 +81,40 @@ Inside a wave, run the full proposal-mode implement-and-validate path for every 
 
 If any proposal in the wave is `NOT_READY` or has a failed/inconclusive required check, stop advancement of later waves. Fix within approved scope when possible; otherwise record the blocker and leave later waves untouched.
 
-### 3. validate-plan after the proposal set
+### 3. validate-plan closed loop after the proposal set
 
-After every proposal in the scope set has completed its implement-and-validate path (or after a hard stop), load and follow the published `validate-plan` skill against the same scope document and its linked proposals/checks/validations. Treat `validate-plan` findings as a gate: address actionable implementation gaps within approved scope and re-run affected checks; do not treat validate-plan as product approval.
+After every proposal in the scope set has completed its implement-and-validate path (or after a hard stop), load and follow the published `validate-plan` skill against the same scope document and its linked proposals/checks/validations. Treat `validate-plan` as a closed loop, not a one-shot report: when it finds actionable gaps or doc/code divergence within approved scope, resume this skill, correct the plan or implementation, refresh evidence and the independent validator packet, update Maat state, and validate again. Do not treat validate-plan as product approval. Do not end the scope run with a backlog of next steps while authorized, executable remediation remains. Checks that depend on unavailable equipment, access, or human decisions are recorded as `manual-validation` with concrete resume instructions only after every other executable item is finished.
 
 ### 4. Stabilize only on full success
 
 Stabilize parallel workstreams only when all of the following hold:
 
-- every required check for every proposal in the scope set has a recorded validation with outcome `pass`;
-- no required check remains `not run`, `fail`, or `inconclusive`;
-- `validate-plan` completed without readiness blockers that invalidate the implementation set (`NOT_READY` or equivalent blocks stabilization).
+- every required check for every proposal in the scope set has a recorded validation with outcome `pass` (or documented `manual-validation` that cannot run in this session);
+- no required check remains `not run`, `fail`, or `inconclusive` unless it is explicitly recorded as `manual-validation` with resume instructions;
+- `validate-plan` completed without readiness blockers that invalidate the implementation set (`NOT_READY` or equivalent blocks stabilization; `READY_WITH_GAPS` is allowed only for documented external/`manual-validation` dependencies).
 
-Stabilization means: merge or replay provisional parallel results into the single integration workspace/branch in wave order, resolve shared-surface conflicts consciously, re-run repository-required gates on the stabilized revision, and update Maat records to the stabilized commit SHAs. If any validation is incomplete or failed, keep workstreams provisional, report the exact failing paths/outcomes, and do not merge or close the scope set as done.
+Stabilization means: merge or replay provisional parallel results into the single integration workspace/branch in wave order, resolve shared-surface conflicts consciously, re-run repository-required gates on the stabilized revision, and update Maat records to the stabilized commit SHAs. If any validation is incomplete or failed, keep workstreams provisional, continue the validate-plan ↔ to-implement loop when the gap is authorized and executable, and do not merge or close the scope set as done.
 
 ### 5. Scope close-out
 
-Report per-proposal paths, validation outcomes, wave schedule, validate-plan readiness label, whether stabilization occurred, and the stabilized revision when it did. Ask explicitly before commit; never assume push. Delivery across an integration branch belongs to `ship` or `integrate-to` when the user requests it.
+Report per-proposal paths, validation outcomes, wave schedule, validate-plan readiness label, remaining `manual-validation` items with resume instructions, whether stabilization occurred, and the stabilized revision when it did. Continuity of the closed loop does not authorize commit or push; ask explicitly before commit and never assume push. Delivery across an integration branch belongs to `ship` or `integrate-to` when the user requests it.
+
+## Keep Maat documents current for UI and resume
+
+After every material state change in this skill — implementation start, slice completion, check run, failed/inconclusive result, remediation, wave progress, stabilization, `manual-validation` blocker, or close-out — update the Maat feature/bug, plan, linked checks, validations, and (in scope mode) the scope Planning status notes so they accurately reflect current status, implementation revision, evidence, pending items, risks, and next gate. Do not leave the durable record behind the working tree or chat.
+
+For each touched artifact:
+
+- Use supported writes with the current `expected_sha`. On conflict, re-read and reassess; never force. Warn before editing a `reviewed` document (may become `final` and reopen approval). Never set `reviewed`/`accepted` via generic `brain_update`.
+- Keep `owner`, `repository`, provenance `sha`, discovery `tags`, and `related` / `feature_id` links among scope ↔ feature/bug ↔ plan ↔ checks ↔ validations populated so the Maat UI lists and opens the work correctly. Resend replaceable fields on every wholesale `brain_update`.
+- Record changed paths, implementation commit/SHA, commands or procedures run, outcomes, blockers, and residual risks in the proposal/validation bodies so a later session can resume from document paths/IDs alone without chat history.
+- After each write, `brain_get` the updated artifacts and verify type, status, content SHA, tags, relations, and validation outcomes. Report only verified paths/SHAs; if a required relation or field is missing, fix it before claiming the stage is done.
+
+If a required write or relation operation is unavailable, report the local evidence plus the exact Maat recording gap; do not claim the UI or a later session can recover that state from Maat.
 
 ## Close the Maat record
 
-After implementation and verification of a proposal, update the feature/bug document only through supported operations with `expected_sha`. Warn before editing a `reviewed` document (may become `final` and reopen approval). Record each check result through the exact supported Maat validation workflow — typically a `validations/….md` document created with `brain_create` or via `operational_record` (`kind=validation`, `status=draft`) then `operational_draft_convert`, then set the documentary status the live contract allows for close (often `done`). For each result, preserve the check path/content SHA, proposal path/content SHA, implementation commit, validation path/content SHA, outcome (`pass`, `fail`, `not run`, or `inconclusive`), and evidence reference. Verify that the validation is actually linked to the same check and proposal through confirmed fields/relations; a written result with no verifiable association does not close the check. Never invent document operations, set `reviewed`/`accepted` via `brain_update`, or claim a result was recorded if it was not. If a required write operation is unavailable, report the change and local evidence, plus the precise Maat recording gap.
+After implementation and verification of a proposal, complete the Maat updates above and close through the exact supported validation workflow — typically a `validations/….md` document created with `brain_create` or via `operational_record` (`kind=validation`, `status=draft`) then `operational_draft_convert`, then set the documentary status the live contract allows for close (often `done`). For each result, preserve the check path/content SHA, proposal path/content SHA, implementation commit, validation path/content SHA, outcome (`pass`, `fail`, `not run`, `inconclusive`, or `manual-validation`), and evidence reference. Verify that the validation is actually linked to the same check and proposal through confirmed fields/relations; a written result with no verifiable association does not close the check. Never invent document operations, set `reviewed`/`accepted` via `brain_update`, or claim a result was recorded if it was not.
 
 Keep implementation evidence linked to the approved proposal and its checks: changed paths, relevant revision/commit, commands or procedures run, pass/fail status, and any blocker. Do not record a new product decision or create an ADR unless a human-approved durable architectural decision requires it. Ask explicitly before commit; never assume push.
 

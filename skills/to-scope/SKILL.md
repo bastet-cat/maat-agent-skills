@@ -92,3 +92,16 @@ When the reviewer requests changes, warn if the document is already `reviewed` (
 Before writing, confirm the Maat project, repository, document profile, logical path, and source revision/provenance from live context. Keep the scope as a documentary `type=scope`; an `operational_record` draft is not a substitute. After `brain_create` or `brain_update`, read the exact document back and verify its type, project/repository, profile, path, status, content SHA, and source links. Return the identifier/path and only a URL returned by Maat; never invent a `docs://` link.
 
 If preparing a review document, put the concrete question(s) in its body and exact owner choices in `alternatives`; preserve the required tags and links. Read it back and verify those fields. Document read-back proves persistence, not that `docs://review` renders the questions and approve/request-changes actions. Claim that interface is available only with direct evidence from the active client; otherwise name the unverified UI capability and its component. Before asking for a decision or moving on, reread the exact review and linked scope revisions and check their identifiers, SHAs/versions, and recorded Maat decision. An already approved decision for those exact versions needs no repeat prompt. Pending means ask only about that review. Requested changes or rejection mean revise according to the recorded feedback. If the UI appears approved while Maat reads pending, repeat reads and compare IDs/versions, diagnose the sync gap, and stop dependent transitions; do not ask twice, advance, or synthesize a decision.
+
+## Keep Maat documents current for UI and resume
+
+After every material state change in this skill — draft creation, content revision, review submission, requested-changes update, recorded decision, or blocked wait — update the Maat scope and any linked review so they accurately reflect current status, requirements, open questions, risks, evidence, and next human gate. Do not leave the durable record behind the conversation.
+
+For each touched artifact:
+
+- Use supported writes with the current `expected_sha`. On conflict, re-read and reassess; never force. Warn before editing a `reviewed` document. Never set `reviewed`/`accepted` via generic `brain_update`.
+- Keep `owner`, `repository`, provenance `sha`, discovery `tags`, and `related` links populated so the Maat UI lists and opens the work correctly. Resend replaceable fields on every `brain_update` that the live schema replaces wholesale (`title`, `body`, `tags`, `related`, and for reviews also `alternatives`).
+- Record source identity/revision, pending decisions, and residual risks in the scope body so a later session can resume from document paths/IDs alone without chat history.
+- After each write, `brain_get` the scope (and review when present) and verify type, status, content SHA, tags, relations, and alternatives. Report only verified paths/SHAs; if a required relation or field is missing, fix it before claiming the stage is done.
+
+If a required write or relation operation is unavailable, present the complete current scope state in chat and name the exact Maat recording gap; do not claim the UI or a later session can recover that state from Maat.
