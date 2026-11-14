@@ -66,8 +66,8 @@ usable Maat registry release.
 | [`to-tech-plan`](skills/to-tech-plan/SKILL.md) | Analyze a scope document against indexed Maat projects, prepare technical refinement for review, and revise it after approval. |
 | [`to-scope`](skills/to-scope/SKILL.md) | Turn a source document or conversation into a scope document (`type=scope`) and publish it through supported Maat document workflows. |
 | [`to-plan`](skills/to-plan/SKILL.md) | Decompose a scope document or conversation into feature/bug proposals with dependency fields, a viable parallelization map on the scope Planning section, and linked validation checks for human review. |
-| [`validate-plan`](skills/validate-plan/SKILL.md) | Assess whether a Maat proposal and its linked checks are complete, traceable, and ready for review or implementation. |
-| [`to-implement`](skills/to-implement/SKILL.md) | Implement an approved Maat feature or bug, or run dependency-aware parallel implementation for a whole scope, then validate-plan and stabilize only after all validations pass. |
+| [`validate-plan`](skills/validate-plan/SKILL.md) | Independently validate a Maat proposal against scope, implementation, and evidence, then close the loop with to-implement until the work is implementable and verifiable. |
+| [`to-implement`](skills/to-implement/SKILL.md) | Implement an approved Maat feature or bug, or run dependency-aware parallel implementation for a whole scope, then close the validate-plan loop and stabilize only after all validations pass. |
 | [`ship`](skills/ship/SKILL.md) | Prepare completed Maat implementation work for commit, push, or pull request with verified validation evidence. |
 | [`integrate-to`](skills/integrate-to/SKILL.md) | Diff-review current work against a named integration branch, fix findings, ship against that branch, and generate a release candidate when the repository defines one. |
 | [`diff-review`](skills/diff-review/SKILL.md) | Review PR and Git diffs for high-confidence bugs. |
@@ -77,7 +77,7 @@ usable Maat registry release.
 
 ```text
 to-scope → to-tech-plan → to-plan → [human review]
-  → to-implement (scope or single proposal) → validate-plan
+  → to-implement (scope or single proposal) ⇄ validate-plan
   → stabilize only when all validations pass
   → ship | integrate-to <branch>
 ```
@@ -85,8 +85,9 @@ to-scope → to-tech-plan → to-plan → [human review]
 - `to-plan` writes `depends_on` / `parallel_wave` on each feature or bug and a
   **Planning** parallelization map on the scope document.
 - `to-implement` in scope mode runs approved proposals by dependency waves,
-  then `validate-plan`; parallel workstreams stay provisional until every
-  required validation passes.
+  then enters the `validate-plan` closed loop (fix → re-validate as needed);
+  parallel workstreams stay provisional until every required validation
+  passes or only documented `manual-validation` gaps remain.
 - `integrate-to <branch>` reviews against that branch, fixes findings, ships
   with that base, and creates a release candidate only when the target
   repository already defines how.

@@ -104,3 +104,16 @@ Keep evidence close to each conclusion: source document revision/content SHA, pr
 Before writing, confirm the Maat project, repository, document profile, logical path, and source scope revision/provenance. Keep the source scope read-only; operational drafts do not replace documentary scope or refinement artifacts. Read every created/updated artifact back and verify type, project/repository, profile, path, status, content SHA, provenance, and relations. Return only identifiers, paths, and URLs actually returned by Maat.
 
 For a review, include the specific refinement question(s) in the body and exact owner choices in non-empty `alternatives`, with required tags and relations. Read back and verify these fields. This confirms stored content, not that `docs://review` renders the question and approve/request-changes actions. Claim UI readiness only with direct active-client evidence; otherwise identify that UI capability as unverified. Before prompting or transitioning, reread the review and exact linked scope/refinement versions; compare identifiers, SHAs/versions, and the recorded decision. Do not repeat a prompt for an already approved exact version. For pending, ask only about that review; for requested changes/rejection, follow recorded feedback. If UI says approved while Maat reads pending, repeat reads, compare identifiers and versions, diagnose the sync gap, and stop dependent work. Do not ask again, advance, or fabricate a decision.
+
+## Keep Maat documents current for UI and resume
+
+After every material state change in this skill — technical-review draft, coverage-matrix update, requested-changes revision, recorded approval/rejection, or creation of the refined scope version — update the Maat review and, when authorized, the refined scope so they accurately reflect current status, evidence, open decisions, risks, and next gate. Do not leave the durable record behind the conversation.
+
+For each touched artifact:
+
+- Use supported writes with the current `expected_sha`. On conflict, re-read and reassess; never force. Keep the original source scope read-only until an approved refinement creates a new scope version/link. Warn before editing a `reviewed` document. Never set `reviewed`/`accepted` via generic `brain_update`.
+- Keep `owner`, `repository`, provenance `sha`, discovery `tags`, and `related` links among source scope ↔ technical review ↔ refined scope (when created) populated so the Maat UI lists and opens the chain correctly. Resend replaceable fields on every wholesale `brain_update` (`title`, `body`, `tags`, `related`, and for reviews also `alternatives`).
+- Record project/revision evidence, unresolved product decisions, and residual risks in the review (and refined scope) body so a later session can resume from document paths/IDs alone without chat history.
+- After each write, `brain_get` the review and any new/updated scope and verify type, status, content SHA, tags, relations, and alternatives. Report only verified paths/SHAs; if a required relation or field is missing, fix it before claiming the stage is done.
+
+If a required write or relation operation is unavailable, present the complete current refinement packet in chat and name the exact Maat recording gap; do not claim the UI or a later session can recover that state from Maat.
