@@ -58,8 +58,18 @@ Reuse it only while repository identity, branch, and baseline commit match; refr
 
 Before a skill acts on a project, summarize the identified project, revision, goal, relevant evidence, scope, and open questions in plain language. If the user already confirmed this same project, revision, goal, and scope in the current conversation, carry that confirmation forward without asking again. Ask for confirmation when the understanding is new, materially changed, or still ambiguous; incorporate corrections before dependent work begins. Keep this understanding check separate from any later product review or decision gate.
 
+## ContextMemory continuity
+
+When the active Maat session provides a ContextMemory session ID or index, consult it before continuing project work. Prefer canonical session resources under `maat://memories/sessions/{session_id}/…` (`index`, `topics/{topic_id}`, `search/{query}`) or call `maat_context_search` / `maat_context_read` with the active session key. Verify recovered details against current repository evidence. Never invent a session key or claim a lookup that was not performed. If no active key is provided, continue from available evidence and state that session continuity data was not supplied.
+
+RAG / handoff cycle for active-context compaction: `maat_context_observe` (occupancy) → `maat_context_handoff` (committed snapshot + index) → recover continuity via `maat://memories/sessions/…` or search/read tools → `maat_context_replace_complete` → `maat_context_session_end` when the session ends. Without a committed handoff, do not claim post-compaction continuity.
+
+## Canonical resource URIs
+
+Use `maat://` for docs (`maat://docs/…`), memories (`maat://memories/{scope}/…`, `…/projects/…`, `…/analysis/…`, `…/sessions/…`), skills (`maat://skills/…`), templates (`maat://templates/{type}`), and template skills (`maat://skills/template/{type}`). `skill://` is Skill Alias only (including `skill://template/{type}`). Do not use removed schemes `docs://`, `brain://`, `project://`, or `analysis://`. Project documents use status `proposed` (not documentary `draft`); operational drafts stay in the DB for agent handoff.
+
 ## Resolve skills and assets
 
-Resolve a skill by its registered ID using only the bootstrap discovery procedure (`skill_list` → paginated `resources/list` → `_manifest` → `resources/read` → digest checks → `skill_list` revalidation). Read only content from that published active release. For package scripts, fetch the asset from that exact release, verify size and SHA-256 against the manifest, preserve its relative path, and execute the script when the task requires it.
+Resolve a skill by its registered ID using only the bootstrap discovery procedure (`skill_list` → paginated `resources/list` → `_manifest` → `resources/read` → digest checks → `skill_list` revalidation). Prefer `maat://skills/…` URIs from the manifest; `skill://` remains readable as alias. Read only content from that published active release. For package scripts, fetch the asset from that exact release, verify size and SHA-256 against the manifest, preserve its relative path, and execute the script when the task requires it.
 
 Do not assume `Mcp-Session-Id` on `/mcp/2026`. Do not treat `clientInfo` as authorization. Do not reuse session or thread IDs from examples or another conversation as Maat transport identity.

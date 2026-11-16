@@ -13,7 +13,7 @@ Use this contract for every Maat skill package load and every Maat tool call. Do
 1. Call `skill_list`. Require **exactly one** record with the requested `id`, `status=published`, and non-empty `active_release_id`.
 2. Do **not** choose a candidate, “latest” by version, a local `.claude/skills` / `.agents/skills` path as the package authority, or a historical release.
 3. Call MCP `resources/list` and follow **every** `nextCursor` until none remains.
-4. Keep only URIs matching `skill://{skill_id}/{active_release_id}/...` (Maat commonly nests as `skill://{skill_id}/{active_release_id}/{skill_id}/_manifest` and `.../SKILL.md`). Never mix URIs from other release IDs even if the same skill appears multiple times in the full list.
+4. Prefer URIs matching `maat://skills/{skill_id}/{active_release_id}/...` from the list/manifest (commonly `.../{skill_id}/_manifest` and `.../SKILL.md`). `skill://{skill_id}/{active_release_id}/...` remains readable as Skill Alias for the same package. Never mix URIs from other release IDs even if the same skill appears multiple times in the full list.
 5. `resources/read` the release `_manifest`. Verify `skill_id` and `release_id` match the `skill_list` record.
 6. Read `SKILL.md` and only the assets needed from that same release. Verify each file’s size and SHA-256 against the manifest.
 7. Call `skill_list` again. Require the same `id` still `published` with the **same** `active_release_id`.
@@ -55,7 +55,7 @@ Large tool replies may truncate (~12k). Prefer `brain_history` (for sha), smalle
 
 - `operational_record` creates/updates **drafts only** (`status=draft`). Allowed kinds are those in the live schema (e.g. activity, decision, adr, blocker, validation, handoff, bug) — **not** product `feature` / `plan` / `check` documents.
 - Convert a draft to a project document with `operational_draft_convert` (uses `brain_create`). Conversion does **not** delete the operational draft; `operational_in_flight` may still list it — that is not a documentary close failure.
-- Feature, plan, check, scope, review, and validation **documents** live in the documentary store (`brain_*` / draft convert). Do not treat operational drafts as product documents.
+- Feature, plan, check, scope, review, and validation **documents** live in the documentary store (`brain_*` / draft convert) under `maat://docs/…`. New project docs use status `proposed` (not documentary `draft`). Do not treat operational drafts as product documents.
 - There is no invented “close” tool in the operational store. Close validation by creating/updating a `validations/…` document to the status the live contract allows (typically `done` after convert), verified with `brain_get`.
 
 ### Review
