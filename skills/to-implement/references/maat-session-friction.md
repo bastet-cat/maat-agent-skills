@@ -56,7 +56,7 @@ Rules:
 
 - After every material state change, update feature/bug, plan, checks, and validations so status, tags, related links, implementation SHA, evidence, pending items, and risks match reality.
 - Read back with `brain_get` before claiming the UI or a later session can recover the work.
-- Keep scope ↔ feature/bug ↔ plan ↔ checks ↔ validations relations current; do not wait until close-out to record progress.
+- Keep spec ↔ feature/bug ↔ plan ↔ checks ↔ validations relations current; do not wait until close-out to record progress.
 
 ## Busy-human communication
 

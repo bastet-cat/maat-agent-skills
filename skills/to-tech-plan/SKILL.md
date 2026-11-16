@@ -1,15 +1,15 @@
 ---
 name: to-tech-plan
-description: Analyze a scope document against Maat project evidence, prepare a technical refinement for human review, and revise it after approval.
+description: Analyze a Maat spec document against project evidence, prepare a technical refinement for human review, and revise it after approval.
 ---
 
-# Refine a scope document for technical execution
+# Refine a spec document for technical execution
 
-Accept a scope-document argument in the form `@<url-or-path>`; use the host client's skill invocation syntax and pass the argument through unchanged. Treat the referenced scope document as read-only. Discover technical impact and ambiguity, prepare a review for the product owner, and create a new scope document version only after that review is approved.
+Accept a spec-document argument in the form `@<url-or-path>`; use the host client's skill invocation syntax and pass the argument through unchanged. Treat the referenced spec document (`type=spec`; legacy `prd` may still resolve) as read-only. Discover technical impact and ambiguity, prepare a review for the product owner, and create a new spec document version only after that review is approved.
 
 This is technical discovery and refinement before executable planning or implementation. Preserve the product intent in the source. Do not create implementation tickets, decide product questions for the owner, start coding, or turn recommendations into commitments. Optimize for faithful, evidence-backed interpretation; never claim a numeric confidence such as 99% without a measured evaluation.
 
-This skill does not create feature/bug/plan/check **product documents**. It prepares a technical review and, after explicit approval, a refined scope document. Use `to-plan` after the product scope and technical refinement are ready when the user wants executable feature/bug documents.
+This skill does not create feature/bug/plan/check **product documents**. It prepares a technical review and, after explicit approval, a refined spec document. Use `to-plan` after the product spec and technical refinement are ready when the user wants executable feature/bug documents.
 
 ## Agent mode
 
@@ -21,13 +21,13 @@ Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.
 
 ## 1. Read the source
 
-Resolve the argument after `@` as a local path or remote document using the available file or document tools. For remote sources, use an available authorized connector or browser; do not assume a particular provider. Capture the title, stable ID, revision or last-modified marker, objectives, requirements, constraints, and references. Record the exact source location and revision evidence. For Maat-stored scope documents, use `brain_get` on the logical path (with `.md` when it is a project document) and keep the content SHA.
+Resolve the argument after `@` as a local path or remote document using the available file or document tools. For remote sources, use an available authorized connector or browser; do not assume a particular provider. Capture the title, stable ID, revision or last-modified marker, objectives, requirements, constraints, and references. Record the exact source location and revision evidence. For Maat-stored spec documents, use `brain_get` on the logical path (with `.md` when it is a project document) and keep the content SHA.
 
-If the source cannot be read, or the argument does not identify one scope document unambiguously, ask only for the missing path, access, or identifier and stop. Never edit or replace the source document.
+If the source cannot be read, or the argument does not identify one spec document unambiguously, ask only for the missing path, access, or identifier and stop. Never edit or replace the source document.
 
 ## 2. Resolve context before asking the owner
 
-First use the scope document, repository, domain docs, and Maat documentary/operational records to answer factual questions. Do not spend the owner's attention on facts the available sources can establish. Identify candidate projects, systems, features, integrations, and domains from explicit requirements and user flows. Label findings as **source requirement**, **verified current behavior**, **inference**, or **unresolved**; make each inference checkable and cite its evidence.
+First use the spec document, repository, domain docs, and Maat documentary/operational records to answer factual questions. Do not spend the owner's attention on facts the available sources can establish. Identify candidate projects, systems, features, integrations, and domains from explicit requirements and user flows. Label findings as **source requirement**, **verified current behavior**, **inference**, or **unresolved**; make each inference checkable and cite its evidence.
 
 For each affected project:
 
@@ -37,9 +37,9 @@ For each affected project:
 
 Carry forward a compact project context record: canonical repository/project identity, branch, commit SHA, evidence source, mapping time, relevant surfaces/contracts, and unresolved gaps. Reuse it while identity and commit match, refresh it after revision changes, and persist it only through confirmed Maat fields/relations. Otherwise include it in the review packet and report that it was not stored as structured Maat context.
 
-For each requirement, trace relevant surfaces instead of stopping at the first matching component: entry points and actors; authorization and tenant boundaries; state/data ownership and lifecycle; APIs, events, and integrations; empty, invalid, and failure behavior; privacy/security; migration and compatibility; operations, observability, reliability, and performance. Record each surface as **evidence found**, **not applicable with reason**, or **unresolved**. This is a coverage sweep, not permission to add requirements the scope document does not imply.
+For each requirement, trace relevant surfaces instead of stopping at the first matching component: entry points and actors; authorization and tenant boundaries; state/data ownership and lifecycle; APIs, events, and integrations; empty, invalid, and failure behavior; privacy/security; migration and compatibility; operations, observability, reliability, and performance. Record each surface as **evidence found**, **not applicable with reason**, or **unresolved**. This is a coverage sweep, not permission to add requirements the spec document does not imply.
 
-Assess whether the scope document describes one coherent product outcome or several distinct outcomes/initiatives, and whether its actors, constraints, and success conditions are sufficiently decided for technical refinement. If it combines independent initiatives or leaves consequential product choices unresolved, tell the user what is broad or undecided and recommend refining/splitting the scope with `to-scope` before presenting a technical design as ready for review. Pause conclusions that depend on those choices. A technically complex but coherent and decided requirement does not need another scope document solely because implementation may be large; document the complexity and risks in the review.
+Assess whether the spec document describes one coherent product outcome or several distinct outcomes/initiatives, and whether its actors, constraints, and success conditions are sufficiently decided for technical refinement. If it combines independent initiatives or leaves consequential product choices unresolved, tell the user what is broad or undecided and recommend refining/splitting the requirements with `to-scope` (producing `type=spec`) before presenting a technical design as ready for review. Pause conclusions that depend on those choices. A technically complex but coherent and decided requirement does not need another spec document solely because implementation may be large; document the complexity and risks in the review.
 
 Before giving technical conclusions or submitting a review, stop if an identified project cannot be accessed or mapped from a confirmed source, or if a conclusion depends on unavailable evidence. Name the project, missing evidence, and what the user must provide. Do not start an index update yourself or continue with unsupported conclusions. When only a product decision remains open, state the precise decision and its consequences, give a recommendation with the condition under which it wins, and ask the smallest useful question (at most three options with a default). Ask only after checking sources; ask questions whose prerequisites are settled, preferably one at a time.
 
@@ -48,20 +48,20 @@ Before giving technical conclusions or submitting a review, stop if an identifie
 Read the current Maat tools and schemas in this session. Catalog text may describe proposed capabilities. In particular:
 
 - Do not infer scope CRUD, search, versioning, or relationships from catalog prose alone — confirm live `brain_*` / review tools.
-- Confirm that the current Maat workflow can associate a product review with this scope document before using review tools.
-- Use only relationship syntax verified for the current parser. Markdown `[[...]]` links are documented; do not assume proposed `docs://` links work.
+- Confirm that the current Maat workflow can associate a product review with this spec document before using review tools.
+- Use only relationship syntax verified for the current parser. Markdown `[[...]]` links are documented; explicit resource links use `maat://docs/...`. Removed schemes such as `docs://` fail closed.
 - Skill-execution review tools (if any) are not a product document review workflow.
-- `operational_record` creates drafts only and does not create a review or scope document. Do not use an incompatible type as a substitute.
+- `operational_record` creates drafts only and does not create a review or spec document. Do not use an incompatible type as a substitute.
 
 If the installed Maat supports creating a review document but not submitting it for review, create and verify the document with `brain_create` / `brain_update` + `expected_sha`, then present its review packet in chat and invite the user to review it there. If document creation is unavailable, present the complete packet in chat instead. Continue only with conclusions supported by available evidence; do not claim a Maat review link exists unless a review operation returns one. If no confirmed operation can create and relate a new scope version after approval, report that limitation when it becomes relevant. Do not simulate a successful submission, publish to an unrelated destination, or write a substitute file without the user's request.
 
 ### Keep operational and documentary records distinct
 
-The source scope, technical review, and revised scope are documentary artifacts. Operational drafts describe in-flight memory; they cannot substitute for those documents, for a documentary review, or for its approval. Likewise, a scope or technical-review document does not prove feature/bug/check documents exist.
+The source spec, technical review, and revised spec are documentary artifacts. Operational drafts describe in-flight memory; they cannot substitute for those documents, for a documentary review, or for its approval. Likewise, a spec or technical-review document does not prove feature/bug/check documents exist.
 
 Before reporting a document, review, or operational relation, identify its store from the live schema and verify it through a supported read. A draft operational status is not a review submission or approval. A review receipt is not approval until a human decision is confirmed. If the document review or revision workflow is missing, report that precise gap and keep conclusions within the available evidence; do not try to route the technical review through `operational_record`. If operational records are absent or unavailable, report that separately and do not let it invalidate a document review that is otherwise supported.
 
-Before preparing the review, summarize in clear language what the scope document asks for, which project/revision was inspected, the affected surfaces, the technical interpretation, scope boundaries, evidence versus inference, and open decisions. Carry forward confirmation already given for the same scope revision, project revision, and scope boundary; do not ask the same understanding question again. Ask only when new evidence materially changes the interpretation or a consequential ambiguity remains. Incorporate corrections before writing or submitting; product review remains a separate gate.
+Before preparing the review, summarize in clear language what the spec document asks for, which project/revision was inspected, the affected surfaces, the technical interpretation, scope boundaries, evidence versus inference, and open decisions. Carry forward confirmation already given for the same spec revision, project revision, and scope boundary; do not ask the same understanding question again. Ask only when new evidence materially changes the interpretation or a consequential ambiguity remains. Incorporate corrections before writing or submitting; product review remains a separate gate.
 
 ## 4. Prepare the technical review
 
@@ -69,21 +69,21 @@ Once project and document coverage is verified, prepare a technical review using
 
 The review must also include:
 
-- Scope title, ID, source location, and source revision/content SHA;
+- Spec title, ID, source location, and source revision/content SHA;
 - technical summary and discovered scope;
 - relevant current architecture and behavior with source references;
 - candidate components and boundaries, dependencies, contracts, and data/operational impact;
-- proposed acceptance criteria and failure scenarios only when they are entailed by the scope document. Map each to a source requirement or explicitly mark it as an unresolved product choice; do not silently promote an inference into a commitment;
+- proposed acceptance criteria and failure scenarios only when they are entailed by the spec document. Map each to a source requirement or explicitly mark it as an unresolved product choice; do not silently promote an inference into a commitment;
 - material security, privacy, migration, reliability, and operational risks;
 - explicit facts, inferences, recommendations, assumptions, open questions, and decisions required from the owner.
 
 For consequential technical choices, present the smallest viable set of alternatives (normally the recommended option and one credible alternative), explain trade-offs, and say what condition would make each option preferable. Do not list options you would not recommend shipping. Do not invent missing product behavior. State uncertainty and present recommendations as options, not approved decisions. Create an ADR only if discovery identifies a durable architectural decision that belongs in an ADR.
 
-When supported, create a documentary review artifact with the original scope identity/revision, related projects, and evidence references. Submit it through the confirmed Maat review operation only if that operation is available and accepts the artifact. Show the returned review identifier/link when one exists. If review submission is unavailable, present the document's review packet in chat and wait for the user's feedback. If document creation is unavailable, present the complete packet in chat. Chat review is a valid human review route, but it is not a Maat document/review record. In either route, do not create the revised scope document until the user explicitly approves the technical refinement. Treat tool responses as receipts; report Maat review type, ID, content SHA/status, and relations only when returned or independently confirmed. Do not infer approval from feedback, silence, or an operational draft.
+When supported, create a documentary review artifact with the original spec identity/revision, related projects, and evidence references. Submit it through the confirmed Maat review operation only if that operation is available and accepts the artifact. Show the returned review identifier/link when one exists. If review submission is unavailable, present the document's review packet in chat and wait for the user's feedback. If document creation is unavailable, present the complete packet in chat. Chat review is a valid human review route, but it is not a Maat document/review record. In either route, do not create the revised spec document until the user explicitly approves the technical refinement. Treat tool responses as receipts; report Maat review type, ID, content SHA/status, and relations only when returned or independently confirmed. Do not infer approval from feedback, silence, or an operational draft.
 
 ### Required review fields and read-back
 
-The technical artifact is also a `type=review`; every created review must include a non-empty `alternatives` array naming the exact technical refinement decision(s) the owner can approve, plus populated `tags` for discovery (for example `["<ticket>", "<area>", "review"]`). The Maat UI uses `alternatives` to show what can be approved; without it, the owner may find nothing to approve. Include supported `related` links to the source scope and evidence documents. Example: `["Aprovar o refinamento técnico da scope <X>, incluindo os critérios <A1–A3>"]`.
+The technical artifact is also a `type=review`; every created review must include a non-empty `alternatives` array naming the exact technical refinement decision(s) the owner can approve, plus populated `tags` for discovery (for example `["<ticket>", "<area>", "review"]`). The Maat UI uses `alternatives` to show what can be approved; without it, the owner may find nothing to approve. Include supported `related` links to the source spec and evidence documents. Example: `["Aprovar o refinamento técnico da spec <X>, incluindo os critérios <A1–A3>"]`.
 
 Pass `alternatives` and `tags` on every review `brain_create` and `brain_update`. Since `brain_update` replaces fields, every review update must resend `alternatives`, `tags`, `related`, `title`, and `body`; never omit one of these fields. After creating or updating the review, call `brain_get` and assert `type=review`, `status=proposed`, non-empty `alternatives`, and populated `tags`. If read-back fails or a required field is empty, report the exact path and failure; do not claim the technical review is ready for approval.
 
@@ -91,29 +91,29 @@ Pass `alternatives` and `tags` on every review `brain_create` and `brain_update`
 
 When the human reviewer responds:
 
-- If changes are requested or the review is rejected, incorporate the feedback into the technical review and resubmit through the same supported workflow (always `expected_sha` on updates). Do not issue an approved scope document. Warn before editing a `reviewed` document.
+- If changes are requested or the review is rejected, incorporate the feedback into the technical review and resubmit through the same supported workflow (always `expected_sha` on updates). Do not issue an approved spec document. Warn before editing a `reviewed` document.
 - If approved, incorporate the explicit decisions and feedback. Recheck technical claims affected by those decisions against current project sources and record new evidence.
-- Write the revised scope document as a new document/version through a confirmed Maat operation with `type=scope` (`brain_create` or supported versioning). Preserve the original. Make requirements identifiable and unambiguous for agent execution, naming actors and systems, preconditions, expected behavior, states and transitions, error scenarios, dependencies, constraints, verifiable acceptance criteria, and unresolved questions. Follow the canonical scope template if the installation supplies one; do not force the technical-review structure onto the scope document. Never set `reviewed`/`accepted` via `brain_update`.
-- Record provenance and links to the original scope document and technical review only through confirmed Maat fields and relationship formats. If that operation is unavailable, stop and report the exact gap; do not write elsewhere or claim completion.
+- Write the revised spec document as a new document/version through a confirmed Maat operation with `type=spec` (`brain_create` or supported versioning), starting in `proposed` unless the live contract requires another allowed proposal status. Preserve the original. Make requirements identifiable and unambiguous for agent execution, naming actors and systems, preconditions, expected behavior, states and transitions, error scenarios, dependencies, constraints, verifiable acceptance criteria, and unresolved questions. Follow `maat://templates/spec` when available; do not force the technical-review structure onto the spec document. Never set `reviewed`/`accepted` via `brain_update`.
+- Record provenance and links to the original spec document and technical review only through confirmed Maat fields and relationship formats (`maat://docs/...` / `[[...]]`). If that operation is unavailable, stop and report the exact gap; do not write elsewhere or claim completion.
 
 ## Evidence discipline
 
 Keep evidence close to each conclusion: source document revision/content SHA, project/repository ID, branch and git SHA, Maat document path and content SHA, and file path/line or concise excerpt. Distinguish observed behavior from interpretation. Name which SHA you are aligning (git provenance vs Maat content SHA). Report source-access, indexing, and document-workflow limits explicitly; never treat missing evidence as proof of no impact.
 # Persist and verify the refinement
 
-Before writing, confirm the Maat project, repository, document profile, logical path, and source scope revision/provenance. Keep the source scope read-only; operational drafts do not replace documentary scope or refinement artifacts. Read every created/updated artifact back and verify type, project/repository, profile, path, status, content SHA, provenance, and relations. Return only identifiers, paths, and URLs actually returned by Maat.
+Before writing, confirm the Maat project, repository, document profile, logical path, and source spec revision/provenance. Keep the source spec read-only; operational drafts do not replace documentary spec or refinement artifacts. Read every created/updated artifact back and verify type, project/repository, profile, path, status, content SHA, provenance, and relations. Return only identifiers, paths, and URLs actually returned by Maat.
 
-For a review, include the specific refinement question(s) in the body and exact owner choices in non-empty `alternatives`, with required tags and relations. Read back and verify these fields. This confirms stored content, not that `docs://review` renders the question and approve/request-changes actions. Claim UI readiness only with direct active-client evidence; otherwise identify that UI capability as unverified. Before prompting or transitioning, reread the review and exact linked scope/refinement versions; compare identifiers, SHAs/versions, and the recorded decision. Do not repeat a prompt for an already approved exact version. For pending, ask only about that review; for requested changes/rejection, follow recorded feedback. If UI says approved while Maat reads pending, repeat reads, compare identifiers and versions, diagnose the sync gap, and stop dependent work. Do not ask again, advance, or fabricate a decision.
+For a review, include the specific refinement question(s) in the body and exact owner choices in non-empty `alternatives`, with required tags and relations. Read back and verify these fields. This confirms stored content, not that a review UI renders the question and approve/request-changes actions. Claim UI readiness only with direct active-client evidence; otherwise identify that UI capability as unverified. Before prompting or transitioning, reread the review and exact linked spec/refinement versions; compare identifiers, SHAs/versions, and the recorded decision. Do not repeat a prompt for an already approved exact version. For pending, ask only about that review; for requested changes/rejection, follow recorded feedback. If UI says approved while Maat reads pending, repeat reads, compare identifiers and versions, diagnose the sync gap, and stop dependent work. Do not ask again, advance, or fabricate a decision.
 
 ## Keep Maat documents current for UI and resume
 
-After every material state change in this skill — technical-review draft, coverage-matrix update, requested-changes revision, recorded approval/rejection, or creation of the refined scope version — update the Maat review and, when authorized, the refined scope so they accurately reflect current status, evidence, open decisions, risks, and next gate. Do not leave the durable record behind the conversation.
+After every material state change in this skill — technical-review proposed, coverage-matrix update, requested-changes revision, recorded approval/rejection, or creation of the refined spec version — update the Maat review and, when authorized, the refined spec so they accurately reflect current status, evidence, open decisions, risks, and next gate. Do not leave the durable record behind the conversation.
 
 For each touched artifact:
 
-- Use supported writes with the current `expected_sha`. On conflict, re-read and reassess; never force. Keep the original source scope read-only until an approved refinement creates a new scope version/link. Warn before editing a `reviewed` document. Never set `reviewed`/`accepted` via generic `brain_update`.
-- Keep `owner`, `repository`, provenance `sha`, discovery `tags`, and `related` links among source scope ↔ technical review ↔ refined scope (when created) populated so the Maat UI lists and opens the chain correctly. Resend replaceable fields on every wholesale `brain_update` (`title`, `body`, `tags`, `related`, and for reviews also `alternatives`).
-- Record project/revision evidence, unresolved product decisions, and residual risks in the review (and refined scope) body so a later session can resume from document paths/IDs alone without chat history.
-- After each write, `brain_get` the review and any new/updated scope and verify type, status, content SHA, tags, relations, and alternatives. Report only verified paths/SHAs; if a required relation or field is missing, fix it before claiming the stage is done.
+- Use supported writes with the current `expected_sha`. On conflict, re-read and reassess; never force. Keep the original source spec read-only until an approved refinement creates a new spec version/link. Warn before editing a `reviewed` document. Never set `reviewed`/`accepted` via generic `brain_update`.
+- Keep `owner`, `repository`, provenance `sha`, discovery `tags`, and `related` links among source spec ↔ technical review ↔ refined spec (when created) populated so the Maat UI lists and opens the chain correctly. Resend replaceable fields on every wholesale `brain_update` (`title`, `body`, `tags`, `related`, and for reviews also `alternatives`).
+- Record project/revision evidence, unresolved product decisions, and residual risks in the review (and refined spec) body so a later session can resume from document paths/IDs alone without chat history.
+- After each write, `brain_get` the review and any new/updated spec and verify type, status, content SHA, tags, relations, and alternatives. Report only verified paths/SHAs; if a required relation or field is missing, fix it before claiming the stage is done.
 
 If a required write or relation operation is unavailable, present the complete current refinement packet in chat and name the exact Maat recording gap; do not claim the UI or a later session can recover that state from Maat.

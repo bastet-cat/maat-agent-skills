@@ -54,10 +54,10 @@ Rules:
 
 ## Maat UI and resume
 
-- After every material state change, update feature/bug, plan, checks, scope Planning, and review so status, tags, related links, Dependencies, evidence, pending items, and risks match reality.
+- After every material state change, update feature/bug, plan, checks, spec Planning, and review so status, tags, related links, Dependencies, evidence, pending items, and risks match reality.
 - Read back with `brain_get` before claiming the UI or a later session can recover the work.
 - Keep `alternatives` and `tags` on every review create/update; resend replaceable fields on wholesale updates.
-- Keep scope ↔ feature/bug ↔ plan ↔ checks ↔ review relations and the Planning map synchronized.
+- Keep spec ↔ feature/bug ↔ plan ↔ checks ↔ review relations and the Planning map synchronized.
 
 ## Busy-human communication
 

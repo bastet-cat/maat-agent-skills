@@ -57,7 +57,7 @@ Rules:
 - After every material state change, update the documentary artifacts so status, tags, related links, evidence, pending items, and risks match reality.
 - Read back with `brain_get` before claiming the UI or a later session can recover the work.
 - Keep `alternatives` and `tags` on every review create/update; resend replaceable fields on wholesale updates.
-- Keep source scope ↔ technical review ↔ refined scope relations current when each exists.
+- Keep source spec ↔ technical review ↔ refined scope relations current when each exists.
 
 ## Busy-human communication
 

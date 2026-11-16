@@ -1,11 +1,11 @@
 ---
 name: to-scope
-description: Turn a source document or the current conversation into a Maat scope document and make it available through supported Maat document workflows.
+description: Turn a source document or the current conversation into a Maat spec document (type=spec) and make it available through supported Maat document workflows.
 ---
 
-# Create a Maat scope document
+# Create a Maat spec document
 
-Use this skill for requests such as “faça uma mudança no produto {x}”, “altere o produto”, “corrija o produto”, or “crie no produto”. Produce a **scope** document proposal (`type=scope`); do not implement product changes or record an unapproved decision.
+Use this skill for requests such as “faça uma mudança no produto {x}”, “altere o produto”, “corrija o produto”, or “crie no produto”. Produce a **spec** document proposal (`type=spec`) that describes product requirements and can guide one or more features; do not implement product changes or record an unapproved decision. Legacy `prd` may remain readable; new requirements documents use `spec`, not `scope`.
 
 ## Agent mode
 
@@ -13,8 +13,8 @@ Run this workflow in the current agent mode. Do not require, check for, or switc
 
 Choose the source from the invocation:
 
-- **Document mode:** an argument identifies a document by local path or URL. Read it as source material and identify all required new behaviors (**features**) and corrections to existing behavior (**bugs/fixes**) that belong in the scope document.
-- **Conversation mode:** no document argument is supplied. Treat the current conversation as the proposal to formalize as a scope document. Clarify material gaps before finalizing requirements.
+- **Document mode:** an argument identifies a document by local path or URL. Read it as source material and identify all required new behaviors (**features**) and corrections to existing behavior (**bugs/fixes**) that belong in the spec document.
+- **Conversation mode:** no document argument is supplied. Treat the current conversation as the proposal to formalize as a spec document. Clarify material gaps before finalizing requirements.
 
 ## Maat session contract
 
@@ -24,7 +24,7 @@ Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.
 
 Confirm Maat MCP is alive. A SessionStart receipt, when exposed, is useful for listing configured skills; its absence alone does not block work when `brain_*` / search tools respond. Discover exact tool names and schemas; do not assume prefixes or capabilities. Diagnose skill load only with `skill_list` (`published` + non-empty `active_release_id`).
 
-For repository-related claims, confirm project identity and current revision from Maat references first. Use `codebase_status` and `workspace_search` when exposed, and verify the indexed snapshot matches the revision before relying on it. Search documentary and operational sources for related scope documents, features, bugs, reviews, decisions, ADRs, and in-flight work when supported. Keep IDs/revisions and code evidence with the claims they support.
+For repository-related claims, confirm project identity and current revision from Maat references first. Use `codebase_status` and `workspace_search` when exposed, and verify the indexed snapshot matches the revision before relying on it. Search documentary and operational sources for related specs (and legacy `prd` if still present), features, bugs, reviews, decisions, ADRs, and in-flight work when supported. Keep IDs/revisions and code evidence with the claims they support.
 
 If Maat has no unambiguous reference to the project, do not infer it from the current directory, document title, repository name, or similar projects. Ask the user for the repository URL and intended branch (and access if needed). After they provide it, clone the repository into an isolated workspace and map the codebase at the checked-out commit before making project-specific claims. If Maat indexing is unavailable, label the clone as direct checkout evidence, not Codebase Memory evidence; report unknown Maat operational context separately. Never ask the user to paste credentials. Do not start index updates yourself.
 
@@ -32,15 +32,15 @@ Carry forward a compact project context record (canonical repository/project ide
 
 ### Keep operational and documentary records distinct
 
-This skill produces a **documentary** scope document via `brain_create` / `brain_update` with `type=scope` (or `operational_draft_convert` when staging a draft). Before writing, identify the actual store and operation from the active session's schema and response:
+This skill produces a **documentary** spec document via `brain_create` / `brain_update` with `type=spec` (or `operational_draft_convert` when staging an operational draft). Before writing, identify the actual store and operation from the active session's schema and response:
 
-- A Maat document operation creates or updates a scope document and may return a separate review record/link. Report only the document and review states that were returned or verified. Always use `expected_sha` on updates.
-- Operational records from `operational_record` are **drafts only** and cannot stand in for scope creation or documentary review. Allowed draft kinds are those in the live schema — not a substitute scope document.
-- Conversely, a scope document or review does not establish that operational proposals or checks exist. Do not claim those records or relations unless verified through the correct store reads.
+- A Maat document operation creates or updates a spec document and may return a separate review record/link. Report only the document and review states that were returned or verified. Always use `expected_sha` on updates. Prefer initial documentary status `proposed` (not documentary `draft`).
+- Operational records from `operational_record` are **operational drafts only** (`status=draft`) and cannot stand in for spec creation or documentary review. Allowed draft kinds are those in the live schema — not a substitute spec document.
+- Conversely, a spec document or review does not establish that operational proposals or checks exist. Do not claim those records or relations unless verified through the correct store reads.
 
-If scope document creation is unavailable, present the complete scope proposal in the conversation and name the missing document operation. Do not create an operational draft as a silent substitute for the requested scope unless the user asks to stage a draft and convert it. If the user separately asks to break the scope into implementation proposals, hand that stage to `to-plan` and verify its documents independently.
+If spec document creation is unavailable, present the complete requirements proposal in the conversation and name the missing document operation. Do not create an operational draft as a silent substitute for the requested spec unless the user asks to stage a draft and convert it. If the user separately asks to break the spec into implementation proposals, hand that stage to `to-plan` and verify its documents independently.
 
-## Understand the request and form the scope
+## Understand the request and form the spec
 
 In document mode, resolve the URL or local path, read the document without editing it, and record its title, stable ID or path, revision marker, goals, requirements, constraints, and references. If it cannot be read or identifies multiple possible sources, ask for the missing access or identifier and stop.
 
@@ -52,56 +52,56 @@ Recover the problem before settling on a solution:
 2. Identify who is affected and what they are trying to do. For a missing capability, find the current workaround and what remains impossible. For work in construction, identify what commitment or downstream work is blocked and why it needs to happen now. For a reported correction, establish current behavior and the desired behavior.
 3. Ask what outcome would show the change worked, by when, and what early signal would show the direction is wrong. Seek a current baseline or an observable proxy. Never invent a metric or threshold. If measurement needs instrumentation that does not exist, mark it as a possible requirement or an unresolved question instead of pretending the result is measurable today.
 4. Consider the smallest credible alternative to building the requested solution: remove a step, change a rule/default, handle an initial cohort manually, buy an existing capability, or defer. Compare alternatives only when they are viable in this context. Record the recommendation, its condition for winning, and why the other live option loses; the product owner decides.
-5. Set a boundary for what this scope document answers and what remains outside it. If a high-impact decision is still unclear, keep it open and do not convert a guess into a requirement. A small, reversible change with clear agreement may need only a concise scope proposal, not a long discovery interview.
+5. Set a boundary for what this spec document answers and what remains outside it. If a high-impact decision is still unclear, keep it open and do not convert a guess into a requirement. A small, reversible change with clear agreement may need only a concise spec proposal, not a long discovery interview.
 
-In both modes, translate the settled understanding into a scope proposal:
+In both modes, translate the settled understanding into a spec proposal:
 
 1. Identify the user problem, affected actors, current behavior, desired outcome, constraints, and relevant flows. Separate direct source facts from inference, recommendations, assumptions, and open questions.
 2. Map each source statement or conversation need to a requirement ID and classify the delivery need as a **feature** (new behavior) or **bug/fix** (correction of existing behavior). Consolidate overlap, expose dependencies, and do not invent behavior to fill gaps.
 3. Write requirements so they are identifiable and verifiable. Name actors/systems, preconditions, expected behavior, state changes, error cases, constraints, dependencies, and observable acceptance criteria when relevant. An outcome metric is not automatically a merge-time test; keep product outcomes distinct from implementation acceptance criteria.
 4. Include out of scope, assumptions, unresolved questions, and decisions required from the owner. State which facts have source evidence and which are inferences. Preserve decisions already made; do not present a recommendation as an approved choice.
-5. Use the canonical Maat scope template if the current installation provides one. Otherwise choose only sections needed to make the proposal self-contained, usually problem, desired outcome, users/flows, requirements, acceptance criteria, scope boundary, dependencies/risks, measurement, and open questions. Do not force empty headings into a short proposal.
+5. Use the canonical Maat spec template (`maat://templates/spec`) if the current installation provides one. Otherwise choose only sections needed to make the proposal self-contained, usually problem, desired outcome, users/flows, requirements, acceptance criteria, scope boundary, dependencies/risks, measurement, and open questions. Do not force empty headings into a short proposal.
 
-Before publication, do a source-to-scope coverage pass: reread the source/request and account for every material need as a requirement, explicit out-of-scope item, or unresolved question. Check that no requirement lacks an origin, no recommendation became a commitment, and a reader who was absent from the discussion can understand the goal and how success will be recognized.
+Before publication, do a source-to-spec coverage pass: reread the source/request and account for every material need as a requirement, explicit out-of-scope item, or unresolved question. Check that no requirement lacks an origin, no recommendation became a commitment, and a reader who was absent from the discussion can understand the goal and how success will be recognized.
 
-The scope document should preserve source provenance and distinguish confirmed requirements from unresolved questions. It must be understandable without relying on hidden conversation context.
+The spec document should preserve source provenance and distinguish confirmed requirements from unresolved questions. It must be understandable without relying on hidden conversation context.
 
 ## Confirm the shared understanding
 
-Before creating or submitting the scope document, show the user a short plain-language summary of the problem, intended outcome, affected users/project, included and excluded scope, source evidence, and unresolved questions. Carry forward the user's confirmation already given in this conversation when it covers the same source revision, outcome, and scope; do not ask the same confirmation again. Ask only if the summary is new, materially changed, or leaves a consequential ambiguity. Incorporate corrections before writing. The later product review remains a separate decision gate.
+Before creating or submitting the spec document, show the user a short plain-language summary of the problem, intended outcome, affected users/project, included and excluded scope, source evidence, and unresolved questions. Carry forward the user's confirmation already given in this conversation when it covers the same source revision, outcome, and scope; do not ask the same confirmation again. Ask only if the summary is new, materially changed, or leaves a consequential ambiguity. Incorporate corrections before writing. The later product review remains a separate decision gate.
 
 ## Publish and route for review
 
-Before writing, inspect the active session's actual document operations and schemas. Confirm a supported way to create and expose a scope document (typically `brain_create` with `type=scope`, a logical path such as `scopes/….md`, plus `owner` / `repository` / provenance `sha`). Confirm relationship syntax before recording links. Prefer canonical document URIs `maat://docs/{kind}/{owner}/{repository}/{id}`; do not use removed `docs://` schemes. If scope creation is unavailable, stop and show the complete proposed scope in the conversation with the exact missing capability; do not claim it is available in Maat or silently write a local substitute.
+Before writing, inspect the active session's actual document operations and schemas. Confirm a supported way to create and expose a spec document (typically `brain_create` with `type=spec`, a logical path such as `specs/….md`, plus `owner` / `repository` / provenance `sha`). Confirm relationship syntax before recording links. Prefer canonical document URIs `maat://docs/{kind}/{owner}/{repository}/{id}`; removed schemes such as `docs://` fail closed. If spec creation is unavailable, stop and show the complete proposed spec in the conversation with the exact missing capability; do not claim it is available in Maat or silently write a local substitute.
 
-Create the scope document through the confirmed Maat operation, preserving the source document identity/revision or conversation provenance and any supported links to affected projects or existing documents. Prefer status values the live schema allows for a proposal (commonly `proposed` or `final` — never documentary `draft`, and never invent `reviewed`/`accepted` via `brain_update`).
+Create the spec document through the confirmed Maat operation, preserving the source document identity/revision or conversation provenance and any supported links to affected projects or existing documents. Prefer initial documentary status `proposed` (never invent `reviewed`/`accepted` via `brain_update`). Move to `final` only when content is closed and ready for review.
 
-If a human review operation is available for a scope document, submit it through the confirmed review tools and report the returned scope and review identifiers/links. If no such operation is available, publish the scope as a proposal and state that review submission is unsupported; do not simulate a review or record a decision. Stop at human review and wait for the owner before treating proposed requirements as approved.
+If a human review operation is available for a spec document, submit it through the confirmed review tools and report the returned spec and review identifiers/links. If no such operation is available, publish the spec as a proposal and state that review submission is unsupported; do not simulate a review or record a decision. Stop at human review and wait for the owner before treating proposed requirements as approved.
 
 ### Create and verify the review document
 
-When the supported document workflow creates a `type=review` for the scope, `alternatives` is mandatory and must be a non-empty array naming the exact owner action(s) being proposed. The Maat UI uses `alternatives` to show what can be approved; omitting it can leave the owner with nothing to approve. Also provide non-empty discovery `tags`, for example `["<ticket>", "<area>", "review"]`, and `related` links to the scope and any evidence documents when supported. A typical option is `["Aprovar o scope <X> e os requisitos <R1–R3>"]`.
+When the supported document workflow creates a `type=review` for the spec, `alternatives` is mandatory and must be a non-empty array naming the exact owner action(s) being proposed. The Maat UI uses `alternatives` to show what can be approved; omitting it can leave the owner with nothing to approve. Also provide non-empty discovery `tags`, for example `["<ticket>", "<area>", "review"]`, and `related` links to the spec and any evidence documents when supported. A typical option is `["Aprovar a spec <X> e os requisitos <R1–R3>"]`.
 
 On every `brain_create` or `brain_update` for a review, send `alternatives` and `tags`. Because `brain_update` replaces fields, every review update must resend `alternatives`, `tags`, `related`, `title`, and `body`; never omit one of these fields. After creating or updating the review, call `brain_get` and assert that it is `type=review`, `status=proposed`, and has a non-empty `alternatives` array (and populated `tags`). If any assertion fails or the read-back is unavailable, report the exact path and failure; do not claim the review is ready for approval.
 
-Treat each write response as an operation receipt: report only the document type (`scope`), identifier, revision/content SHA, links/relations, and review state actually returned or confirmed. On update conflicts, re-read with `brain_get` and retry with the new `expected_sha`. If the operation cannot return or verify an expected relation, state that limitation instead of implying a complete link.
+Treat each write response as an operation receipt: report only the document type (`spec`), identifier, revision/content SHA, links/relations, and review state actually returned or confirmed. On update conflicts, re-read with `brain_get` and retry with the new `expected_sha`. If the operation cannot return or verify an expected relation, state that limitation instead of implying a complete link.
 
-When the reviewer requests changes, warn if the document is already `reviewed` (edit may reopen approval as `final`), update through the same confirmed Maat workflow with `expected_sha`, preserve history/provenance, and resubmit if supported. Record a decision only after the human provides one and only through a confirmed Maat operation — not via generic `brain_update` status fields.
-# Persist and verify the scope
+When the reviewer requests changes, warn if the document is already `reviewed` (edit may reopen approval as `final`), update through the same confirmed Maat workflow with `expected_sha`, preserve history/provenance, and resubmit if supported. Record a decision only after the human provides one and only through a confirmed Maat operation — not via generic `brain_update` status fields. Only accepted review + accepted decision may advance a related `final` document to `reviewed`.
+# Persist and verify the spec
 
-Before writing, confirm the Maat project, repository, document profile, logical path, and source revision/provenance from live context. Keep the scope as a documentary `type=scope`; an `operational_record` draft is not a substitute. After `brain_create` or `brain_update`, read the exact document back and verify its type, project/repository, profile, path, status, content SHA, and source links. Return the identifier/path and only a URL returned by Maat; never invent a `docs://` link.
+Before writing, confirm the Maat project, repository, document profile, logical path, and source revision/provenance from live context. Keep the document as a documentary `type=spec`; an `operational_record` draft is not a substitute. After `brain_create` or `brain_update`, read the exact document back and verify its type, project/repository, profile, path, status, content SHA, and source links. Return the identifier/path and only a URL returned by Maat; never invent a `docs://` link — prefer `maat://docs/spec/{owner}/{repository}/{id}` when returned.
 
-If preparing a review document, put the concrete question(s) in its body and exact owner choices in `alternatives`; preserve the required tags and links. Read it back and verify those fields. Document read-back proves persistence, not that `docs://review` renders the questions and approve/request-changes actions. Claim that interface is available only with direct evidence from the active client; otherwise name the unverified UI capability and its component. Before asking for a decision or moving on, reread the exact review and linked scope revisions and check their identifiers, SHAs/versions, and recorded Maat decision. An already approved decision for those exact versions needs no repeat prompt. Pending means ask only about that review. Requested changes or rejection mean revise according to the recorded feedback. If the UI appears approved while Maat reads pending, repeat reads and compare IDs/versions, diagnose the sync gap, and stop dependent transitions; do not ask twice, advance, or synthesize a decision.
+If preparing a review document, put the concrete question(s) in its body and exact owner choices in `alternatives`; preserve the required tags and links. Read it back and verify those fields. Document read-back proves persistence, not that a review UI renders the questions and approve/request-changes actions. Claim that interface is available only with direct evidence from the active client; otherwise name the unverified UI capability and its component. Before asking for a decision or moving on, reread the exact review and linked spec revisions and check their identifiers, SHAs/versions, and recorded Maat decision. An already approved decision for those exact versions needs no repeat prompt. Pending means ask only about that review. Requested changes or rejection mean revise according to the recorded feedback. If the UI appears approved while Maat reads pending, repeat reads and compare IDs/versions, diagnose the sync gap, and stop dependent transitions; do not ask twice, advance, or synthesize a decision.
 
 ## Keep Maat documents current for UI and resume
 
-After every material state change in this skill — draft creation, content revision, review submission, requested-changes update, recorded decision, or blocked wait — update the Maat scope and any linked review so they accurately reflect current status, requirements, open questions, risks, evidence, and next human gate. Do not leave the durable record behind the conversation.
+After every material state change in this skill — proposed creation, content revision, review submission, requested-changes update, recorded decision, or blocked wait — update the Maat spec and any linked review so they accurately reflect current status, requirements, open questions, risks, evidence, and next human gate. Do not leave the durable record behind the conversation.
 
 For each touched artifact:
 
 - Use supported writes with the current `expected_sha`. On conflict, re-read and reassess; never force. Warn before editing a `reviewed` document. Never set `reviewed`/`accepted` via generic `brain_update`.
 - Keep `owner`, `repository`, provenance `sha`, discovery `tags`, and `related` links populated so the Maat UI lists and opens the work correctly. Resend replaceable fields on every `brain_update` that the live schema replaces wholesale (`title`, `body`, `tags`, `related`, and for reviews also `alternatives`).
-- Record source identity/revision, pending decisions, and residual risks in the scope body so a later session can resume from document paths/IDs alone without chat history.
-- After each write, `brain_get` the scope (and review when present) and verify type, status, content SHA, tags, relations, and alternatives. Report only verified paths/SHAs; if a required relation or field is missing, fix it before claiming the stage is done.
+- Record source identity/revision, pending decisions, and residual risks in the spec body so a later session can resume from document paths/IDs alone without chat history.
+- After each write, `brain_get` the spec (and review when present) and verify type, status, content SHA, tags, relations, and alternatives. Report only verified paths/SHAs; if a required relation or field is missing, fix it before claiming the stage is done.
 
-If a required write or relation operation is unavailable, present the complete current scope state in chat and name the exact Maat recording gap; do not claim the UI or a later session can recover that state from Maat.
+If a required write or relation operation is unavailable, present the complete current spec state in chat and name the exact Maat recording gap; do not claim the UI or a later session can recover that state from Maat.

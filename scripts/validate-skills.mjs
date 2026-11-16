@@ -14,9 +14,33 @@ const maatUiResumeContract = {
 
 /** Behavioral contracts that keep workflow skills aligned with the closed-loop process. */
 const skillContracts = {
-  'to-scope': [maatUiResumeContract],
+  'to-scope': [
+    maatUiResumeContract,
+    {
+      id: 'canonical-spec-type',
+      pattern: /type=spec/,
+    },
+    {
+      id: 'proposed-not-documentary-draft',
+      pattern: /proposed/i,
+    },
+  ],
   'to-tech-plan': [maatUiResumeContract],
-  'to-plan': [maatUiResumeContract],
+  'to-plan': [
+    maatUiResumeContract,
+    {
+      id: 'implementation-mode-subagent',
+      pattern: /implementation_mode:\s*subagent/,
+    },
+    {
+      id: 'validation-mode-independent-subagent',
+      pattern: /validation_mode:\s*independent_subagent/,
+    },
+    {
+      id: 'proposed-documentary-status',
+      pattern: /documentary `proposed`/,
+    },
+  ],
   'validate-plan': [
     {
       id: 'compare-plan-scope-implementation-evidence',
@@ -58,13 +82,21 @@ const skillContracts = {
       pattern: /validate-plan` closed loop|validate-plan closed loop|re-enter `validate-plan`/i,
     },
     {
+      id: 'implementation-mode-subagent',
+      pattern: /implementation_mode:\s*subagent/,
+    },
+    {
+      id: 'validation-mode-independent-subagent',
+      pattern: /validation_mode:\s*independent_subagent/,
+    },
+    {
       id: 'manual-validation',
       pattern: /manual-validation/,
     },
     {
       id: 'no-premature-next-steps',
       pattern:
-        /Do not stop with a list of next steps|Do not end the scope run with a backlog of next steps/i,
+        /Do not stop with a list of next steps|Do not end the (?:scope )?run with a backlog of next steps/i,
     },
     maatUiResumeContract,
     {
