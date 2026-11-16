@@ -1,11 +1,11 @@
 ---
 name: to-plan
-description: Turn decided product requirements into evidence-grounded Maat feature or bug proposals with traceable checks for human review.
+description: Turn decided product requirements into evidence-grounded Maat feature or bug proposals with explicit inter-proposal dependencies, a viable parallelization map on the source spec, and traceable checks for independent subagent validation.
 ---
 
 # Plan Maat implementation proposals
 
-Use this skill when asked to plan/specify a sigle feature or fix, including “planeje a feature {x}”, “monte um plano”, or “especifique um feature/bug”. Keep the result as a proposal for human review. Do not implement it or record an unapproved decision.
+Use this skill when asked to plan/specify a single feature or fix, including “planeje a feature {x}”, “monte um plano”, or “especifique um feature/bug”. Keep the result as a proposal for human review. Do not implement it or record an unapproved decision.
 
 ## Agent mode
 
@@ -13,18 +13,18 @@ Run this workflow in the current agent mode. Do not require, check for, or switc
 
 Choose the input mode from the invocation:
 
-- **Scope mode:** an argument identifies a scope document. Read it as the product-scope source and map its requirements to all technically necessary feature and/or bug proposals.
-- **Conversation mode:** no document argument is supplied. Use the current conversation as the request context and prepare a proposal for the needed feature or bug. Do not assume an absent scope document.
+- **Spec mode:** an argument identifies a spec document (`type=spec`; legacy `prd` may still resolve). Read it as the product-requirements source and map its requirements to all technically necessary feature and/or bug proposals.
+- **Conversation mode:** no document argument is supplied. Use the current conversation as the request context and prepare a proposal for the needed feature or bug. Do not assume an absent spec document.
 
 ## Maat session contract
 
 Follow `references/maat-mcp-bootstrap.md` and `references/maat-session-friction.md`. Handshake before any Maat write.
 
-## Check whether planning needs a scope document first
+## Check whether planning needs a spec document first
 
-Direct prompt or conversation-context entry is for short, well-defined requests that fit in exactly one feature or one bug/fix. Before planning, assess both scope and product readiness. If interpreting the prompt or conversation context would produce more than one feature/fix, combines distinct user journeys or initiatives, is too broad to deliver as one outcome, or leaves consequential actors, goals, constraints, or success measures undecided, do not generate any feature/fix from `to-plan`: explain the concrete signals and require the user to start with `to-scope` and capture the product scope in a scope document first.
+Direct prompt or conversation-context entry is for short, well-defined requests that fit in exactly one feature or one bug/fix. Before planning, assess both scope and product readiness. If interpreting the prompt or conversation context would produce more than one feature/fix, combines distinct user journeys or initiatives, is too broad to deliver as one outcome, or leaves consequential actors, goals, constraints, or success measures undecided, do not generate any feature/fix from `to-plan`: explain the concrete signals and require the user to start with `to-scope` and capture the product requirements in a `type=spec` document first.
 
-Do not use an arbitrary count of requirements, components, or implementation steps as the threshold: decide whether the user's short request can be expressed as one observable outcome with one coherent set of acceptance criteria. In scope mode, one scope document may produce multiple independently reviewable features/fixes when its requirements justify them; do not send the user back to create another scope document just because several proposals are needed. If the scope document's product intent is too ambiguous to support defensible slices, identify the unresolved decisions and recommend scope refinement before creating documents.
+Do not use an arbitrary count of requirements, components, or implementation steps as the threshold: decide whether the user's short request can be expressed as one observable outcome with one coherent set of acceptance criteria. In spec mode, one spec document may produce multiple independently reviewable features/fixes when its requirements justify them; do not send the user back to create another spec just because several proposals are needed. If the spec document's product intent is too ambiguous to support defensible slices, identify the unresolved decisions and recommend `to-scope` refinement before creating documents.
 
 ## Establish the Maat context
 
@@ -36,13 +36,14 @@ Carry forward a project context record with canonical repository/project identit
 
 ## Build the proposal set
 
-### Scope mode
+### Spec mode
 
-1. Resolve the provided argument as one unambiguous source document (`brain_get` for Maat paths, or file/URL tools). Read it without editing it; record its title, stable identifier or location, revision/content SHA, goals, requirements, constraints, and references. If it cannot be read or does not identify one scope document, ask for the missing path/access/identifier and stop.
+1. Resolve the provided argument as one unambiguous source document (`brain_get` for Maat paths, or file/URL tools). Read it without editing it; record its title, stable identifier or location, revision/content SHA, goals, requirements, constraints, and references. If it cannot be read or does not identify one spec document, ask for the missing path/access/identifier and stop.
 2. Trace every requirement and relevant user flow through affected projects, systems, data ownership, APIs/events, authorization, persistence, operations, and failure behavior. Distinguish direct evidence from inference and make each inference checkable.
-3. Map requirements to the smallest coherent set of proposals needed for delivery. Create a **feature** for new product behavior and a **bug** for correcting behavior that contradicts an established expectation. Do not classify work from wording alone: confirm the current behavior or cite the source that establishes the expected behavior. A scope document can yield multiple proposals, and one can cover closely related requirements.
-4. Choose boundaries by independently reviewable and verifiable outcomes. Prefer a vertical slice that demonstrates user-visible or operational value across the layers it needs. Split only when each part can be reviewed and validated independently or has a real dependency; merge parts that cannot demonstrate the intended outcome alone. Avoid one item per technical layer, duplicate proposals, and speculative scope. Write the proposed grouping and dependency edges in a concise numbered breakdown before creating documents. If the source leaves a material split/merge or dependency decision open, ask one focused question (≤3 options with default); otherwise proceed without an approval round that repeats the later product review.
-5. For each proposal, state source requirement(s), intended outcome, current/expected behavior, boundaries, affected projects/components, real dependencies, observable acceptance criteria, failure scenarios, and technical risks. Separate direct evidence, inference, recommendation, assumption, and unresolved product decision. Do not decide product questions for the owner.
+3. Map requirements to the smallest coherent set of proposals needed for delivery. Create a **feature** for new product behavior and a **bug** for correcting behavior that contradicts an established expectation. Do not classify work from wording alone: confirm the current behavior or cite the source that establishes the expected behavior. A spec document can yield multiple proposals, and one can cover closely related requirements.
+4. Choose boundaries by independently reviewable and verifiable outcomes. Prefer a vertical slice that demonstrates user-visible or operational value across the layers it needs. Split only when each part can be reviewed and validated independently or has a real dependency; merge parts that cannot demonstrate the intended outcome alone. Avoid one item per technical layer, duplicate proposals, and speculative scope. Write the proposed grouping and **dependency edges** in a concise numbered breakdown before creating documents. Every edge must name a prerequisite proposal outcome that truly blocks another; do not invent ordering for convenience. If the source leaves a material split/merge or dependency decision open, ask one focused question (≤3 options with default); otherwise proceed without an approval round that repeats the later product review.
+5. For each proposal, state source requirement(s), intended outcome, current/expected behavior, boundaries, affected projects/components, **`depends_on` prerequisites**, observable acceptance criteria, failure scenarios, and technical risks. Separate direct evidence, inference, recommendation, assumption, and unresolved product decision. Do not decide product questions for the owner.
+6. Derive the **viable parallelization map** from the dependency edges before writing documents: group proposals into the smallest set of waves such that every item in a wave has all of its `depends_on` prerequisites in earlier waves (or none). Items in the same wave may proceed in parallel during implementation. Reject cycles; if a cycle appears, merge the coupled proposals or ask one focused question to break it. Record which shared surfaces (files, schemas, contracts) would collide if parallelized so implementers can avoid false parallelism.
 
 ### Conversation mode
 
@@ -56,9 +57,27 @@ Cover every acceptance criterion with at least one check and every high-risk fai
 
 Before writing, perform a coverage pass in both directions: every source need is represented by a proposal or explicitly marked out of scope/unresolved, and every acceptance criterion has a check. Mark any exposed surface not defined by the source (for example authorization, empty/error states, migration, or operations) as existing behavior, not applicable, or unresolved; never turn the sweep into invented requirements. Identify durable architectural choices only when evidence shows one is needed. Present alternatives and trade-offs for human choice. An ADR is appropriate only for a durable architectural decision; do not turn routine implementation details into ADRs.
 
+### Dependency field (required on every feature/bug)
+
+Every feature or bug document must carry an explicit **Dependencies** section that implementers and `to-implement` can parse without reading the whole plan. Use this shape in the document body:
+
+```markdown
+## Dependencies
+- depends_on: [<logical paths or stable IDs of prerequisite features/bugs>]
+- dependency_reason: <one line per depends_on entry, or "none">
+- parallel_wave: <integer wave from the parallelization map; 1 = no blockers>
+```
+
+Rules:
+
+- `depends_on` lists only other proposals in this planning set (or already-delivered Maat proposals with verified paths). Empty list means the item can start in wave 1.
+- Reasons name the blocking outcome (contract, data, UI seam), not a vague “related work”.
+- Put every `depends_on` target path in the document's `related` array when the live schema accepts it, together with the source spec path in spec mode.
+- Plans and review packets must restate the same edges; do not let body, `related`, and the scope planning map disagree.
+
 ## Confirm the shared understanding
 
-Before creating proposal/check documents, show a concise, plain-language summary of the source goal, current behavior, intended outcome, mapped feature/bug slices, affected project and revision, linked checks, scope boundaries, evidence versus inference, and unresolved questions. Carry forward confirmation already given for the same source, project revision, and scope; do not repeat that question. Ask only if the understanding is new, materially changed, or consequentially ambiguous. Incorporate corrections before writing; human product review remains a separate gate.
+Before creating proposal/check documents, show a concise, plain-language summary of the source goal, current behavior, intended outcome, mapped feature/bug slices, **dependency edges and parallel waves**, affected project and revision, linked checks, scope boundaries, evidence versus inference, and unresolved questions. Carry forward confirmation already given for the same source, project revision, and scope; do not repeat that question. Ask only if the understanding is new, materially changed, or consequentially ambiguous. Incorporate corrections before writing; human product review remains a separate gate.
 
 ## Create and verify project documents
 
@@ -66,9 +85,9 @@ Primary outputs are **project documents** in the documentary store: feature or b
 
 ### Preflight the documentary contract
 
-Discover live schemas. Before the first write, confirm that `brain_create` (and `brain_update` with `expected_sha`) can create the needed document types, or that the supported path is `operational_record` (**draft only**) → `operational_draft_convert` → project document. Confirm how `feature_id` / `related` / path conventions work on this installation (logical paths with `.md`, e.g. `features/….md`, `plans/….md`, `checks/….md`).
+Discover live schemas. Before the first write, confirm that `brain_create` (and `brain_update` with `expected_sha`) can create the needed document types, or that the supported path is `operational_record` (**draft only**) → `operational_draft_convert` → project document. Confirm how `feature_id` / `related` / path conventions work on this installation (logical paths with `.md`, e.g. `features/….md`, `plans/….md`, `checks/….md`). Read `maat://templates/feature`, `maat://templates/bug`, `maat://templates/plan`, and `maat://templates/check` when available.
 
-**Hard rule:** `operational_record` does **not** create feature, plan, or check documents. Its live schema accepts only draft kinds such as activity, decision, adr, blocker, validation, handoff, and bug-as-draft — and only `status=draft`. Do not instruct or attempt `kind: feature|plan|check` or `status: planned` on `operational_record`.
+**Hard rule:** `operational_record` does **not** create feature, plan, check, or spec documents. Its live schema accepts only operational draft kinds such as activity, decision, adr, blocker, validation, handoff, and bug-as-draft — and only operational `status=draft`. Do not instruct or attempt `kind: feature|plan|check|spec` or documentary statuses on `operational_record`.
 
 Map scope, evidence, criteria, risks, dependencies, and open questions into fields the live schema accepts. Require `owner`, `repository`, and provenance `sha` on documentary creates/updates as the schema specifies. If documentary create is unavailable and draft-convert is also unavailable, make no writes and report the exact gap. Do not substitute free-form notes for these documents without saying so.
 
@@ -82,15 +101,22 @@ Optional staging: create an operational draft with `operational_record` (`status
 
 Create or update only the documents needed, in this order:
 
-1. **Feature or bug document:** choose feature for new behavior and bug for a correction. Record source, problem/current behavior, intended outcome, scope and exclusions, affected project/evidence, acceptance criteria, risks, dependencies, and open questions. Keep it in `draft` while the full proposal set is incomplete. Never set `reviewed`/`accepted` via `brain_create` or `brain_update`.
-2. **Plan document:** create with `feature_id` (or equivalent relation) pointing at the feature/bug document. Include delivery scope/slices, criterion coverage, evidence, dependencies, risks, and unresolved decisions. Keep it in `draft` while the full proposal set is incomplete.
-3. **Check documents:** one check document per falsifiable check, each related to the same feature/bug. Every check must identify its criterion, scenario/setup and action, and observable expected result/evidence. Keep paths/IDs stable across retries.
+1. **Feature or bug document:** choose feature for new behavior and bug for a correction. Record source, problem/current behavior, intended outcome, scope and exclusions, affected project/evidence, acceptance criteria, risks, the required **Dependencies** field (`depends_on`, `dependency_reason`, `parallel_wave`), and open questions. Keep it in documentary `proposed` while the full proposal set is incomplete. Never set `reviewed`/`accepted` via `brain_create` or `brain_update`.
+2. **Plan document:** create with `feature_id` (or equivalent relation) pointing at the feature/bug document. Include delivery scope/slices, criterion coverage, evidence, the same dependency edges and wave assignment, risks, and unresolved decisions. Honor the live plan template: set `implementation_mode: subagent` and record `implementation_subagent_model` from `maat://templates/plan` (or the model value written into the plan). Plans orchestrate verifiable slices via subagents; they do not replace the proposal. Keep the plan in documentary `proposed` while the full proposal set is incomplete.
+3. **Check documents:** one check document per falsifiable check, each related to the same feature/bug. Every check must identify its criterion, scenario/setup and action, and observable expected result/evidence. Honor the live check template: set `validation_mode: independent_subagent` and record `independent_validator_model` from `maat://templates/check` (or the model value written into the check). Keep paths/IDs stable across retries. Check status may include `manual-validation` when the live schema allows it.
+4. **Spec planning area (spec mode only):** after the proposal set exists, update the source spec document with `brain_update` and its current `expected_sha` so it gains or replaces a top-level **Planning** section. Do not erase unrelated spec content. The Planning section is the durable base-specification map for parallel implementation and must include:
+   - **Proposal index:** each feature/bug path, type, one-line outcome, and `parallel_wave`.
+   - **Dependency graph:** every `depends_on` edge with its reason (or an explicit “no edges” statement).
+   - **Viable parallelization map:** waves in order; for each wave, the proposals that may run in parallel and any shared-surface collision notes that force serialization inside the wave.
+   - **Stabilization rule:** parallel workstreams for this spec stay provisional until every linked proposal's validations have been checked and passed (see `to-implement` spec mode).
+
+   Read the updated spec back and verify the Planning section matches the feature/bug `Dependencies` fields and plan documents. If the spec cannot be updated, report the exact gap and keep the same map in the review packet so implementers are not blocked silently.
 
 If an unexpected write failure occurs after some documents were created, report the exact partial state and paths/SHAs; do not conceal it or recreate successful writes. Resume only missing/failed writes after reading current state.
 
 ### Read back and verify
 
-After writes, `brain_get` (or confirmed reads) for the feature/bug, plan, and every check. Verify and report each path, type, content SHA/status, and `feature_id`/related links. Confirm all documents point to the same feature/bug and that the complete set passes the coverage review. Only then use `brain_update` with each current `expected_sha` to move the feature/bug and plan to `final`. Keep checks linked and verified without inventing a lifecycle transition for them. Read the promoted documents back before creating the review. If a read is unavailable, report exactly which documents or relations could not be verified; do not claim successful verification.
+After writes, `brain_get` (or confirmed reads) for the feature/bug, plan, every check, and the updated spec Planning section in spec mode. Verify and report each path, type, content SHA/status, and `feature_id`/related/`depends_on` links. Confirm all documents point to the same feature/bug, that dependency edges and waves agree across feature/bug, plan, and scope Planning, and that the complete set passes the coverage review. Only then use `brain_update` with each current `expected_sha` to move the feature/bug and plan to `final`. Keep checks linked and verified without inventing a lifecycle transition for them. Read the promoted documents back before creating the review. If a read is unavailable, report exactly which documents or relations could not be verified; do not claim successful verification.
 
 ## Prepare the review packet and choose a review route
 
@@ -123,14 +149,33 @@ Treat the user's comments in chat as review feedback, not automatic approval; in
 The review packet must make the proposal understandable without relying on unstated context. Include:
 
 - proposal type and concise title;
-- source conversation or scope document identity/revision and requirement coverage;
+- source conversation or spec document identity/revision and requirement coverage;
 - problem/current behavior and intended outcome;
 - technical scope, affected project evidence, boundaries, and dependencies;
 - observable acceptance criteria and relevant failure cases;
 - associated validation checks, each mapped to one or more acceptance criteria;
-- real dependency edges and why each blocker is necessary;
+- real dependency edges (`depends_on`), wave assignments, and why each blocker is necessary;
+- the spec **Planning** parallelization map (spec mode) or the same map embedded in the packet (conversation mode with multiple proposals);
 - risks, alternatives, assumptions, and questions requiring human choice.
 
-Before submitting, check the proposed breakdown for over-splitting and missing integration: each proposal should answer “what can a user or operator observe when this lands?” and each dependency should name the prerequisite outcome, not merely a related component. Keep the user's original requirements intact when removing an unnecessary ticket/slice.
+Before submitting, check the proposed breakdown for over-splitting and missing integration: each proposal should answer “what can a user or operator observe when this lands?” and each dependency should name the prerequisite outcome, not merely a related component. Confirm the parallelization map has no cycles and that every wave-1 item truly has an empty `depends_on`. Keep the user's original requirements intact when removing an unnecessary ticket/slice.
 
 Report the verified document paths, types, content SHAs, statuses, and relations; summarize source traceability and unresolved gaps. Include a review document or link only when created and returned/verified by a supported operation. Otherwise include the review packet in chat and wait for feedback. Distinguish review feedback from explicit approval; only a confirmed human decision may authorize an approved/`reviewed` state.
+# Preserve artifact boundaries and review state
+
+Use the relevant documentary sequence: spec when the request needs product discovery; technical refinement when its review is needed; then feature/bug proposal, plan, and linked checks; independent validation when requested; implementation and delivery only at their authorized gates. Skip irrelevant stages and do not turn `operational_record` drafts into product documents. Before each write, confirm project, repository, profile, logical path, and source revision/provenance. Read back each artifact and verify its type, status, content SHA, provenance, and relations before relying on it; return only Maat identifiers/paths and returned URLs.
+
+For reviews, put the concrete decision question(s) in the body and exact choices in non-empty `alternatives`, retaining required tags and relations. Read back and verify. A stored review does not prove that the review UI shows its questions and approve/request-changes actions; claim that only with direct active-client evidence, otherwise state the unverified UI capability/component. Before asking or advancing, reread the review and every linked artifact at the exact IDs and SHAs/versions and inspect the recorded decision. Carry forward approval only for those exact revisions; pending means ask only about that review; requested changes/rejection means follow the recorded feedback and create revised content as authorized. If UI appears approved while Maat reads pending, repeat reads and compare IDs/versions, diagnose the sync mismatch, and stop dependent work. Do not duplicate the prompt, advance, or synthesize approval.
+
+## Keep Maat documents current for UI and resume
+
+After every material state change in this skill — feature/bug or plan proposed, check create/update, Dependencies or Planning-map change, promotion to `final`, review create/update, requested-changes revision, or recorded decision — update the Maat feature/bug, plan, checks, spec Planning section (spec mode), and review so they accurately reflect current status, criteria, dependencies, evidence, open questions, risks, and next gate. Do not leave the durable record behind the conversation.
+
+For each touched artifact:
+
+- Use supported writes with the current `expected_sha`. On conflict, re-read and reassess; never force. Warn before editing a `reviewed` document. Never set `reviewed`/`accepted` via generic `brain_update`.
+- Keep `owner`, `repository`, provenance `sha`, discovery `tags`, and `related` / `feature_id` links among spec ↔ feature/bug ↔ plan ↔ checks ↔ review populated so the Maat UI lists and opens the set correctly (features/bugs under Implementations; reviews/decisions nested under the related feature). Keep `Dependencies` fields and the spec **Planning** section synchronized. Resend replaceable fields on every wholesale `brain_update` (`title`, `body`, `tags`, `related`, and for reviews also `alternatives`).
+- Record source requirement coverage, wave/dependency state, pending decisions, and residual risks in the proposal and plan bodies so a later session can resume from document paths/IDs alone without chat history.
+- After each write, `brain_get` the feature/bug, plan, checks, updated spec Planning section when applicable, and review when present; verify type, status, content SHA, tags, relations, Dependencies, plan `implementation_mode` / `implementation_subagent_model`, check `validation_mode` / `independent_validator_model`, and alternatives. Report only verified paths/SHAs; if a required relation or field is missing, fix it before claiming the stage is done.
+
+If a required write or relation operation is unavailable, present the complete current proposal set in chat and name the exact Maat recording gap; do not claim the UI or a later session can recover that state from Maat.
